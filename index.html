@@ -1,0 +1,906 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Südinsel Roadtrip 2027</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Südinsel">
+<meta name="theme-color" content="#2f6b4f">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-192.png">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+/* required styles */
+
+.leaflet-pane,
+.leaflet-tile,
+.leaflet-marker-icon,
+.leaflet-marker-shadow,
+.leaflet-tile-container,
+.leaflet-pane > svg,
+.leaflet-pane > canvas,
+.leaflet-zoom-box,
+.leaflet-image-layer,
+.leaflet-layer {
+	position: absolute;
+	left: 0;
+	top: 0;
+	}
+.leaflet-container {
+	overflow: hidden;
+	}
+.leaflet-tile,
+.leaflet-marker-icon,
+.leaflet-marker-shadow {
+	-webkit-user-select: none;
+	   -moz-user-select: none;
+	        user-select: none;
+	  -webkit-user-drag: none;
+	}
+/* Prevents IE11 from highlighting tiles in blue */
+.leaflet-tile::selection {
+	background: transparent;
+}
+/* Safari renders non-retina tile on retina better with this, but Chrome is worse */
+.leaflet-safari .leaflet-tile {
+	image-rendering: -webkit-optimize-contrast;
+	}
+/* hack that prevents hw layers "stretching" when loading new tiles */
+.leaflet-safari .leaflet-tile-container {
+	width: 1600px;
+	height: 1600px;
+	-webkit-transform-origin: 0 0;
+	}
+.leaflet-marker-icon,
+.leaflet-marker-shadow {
+	display: block;
+	}
+/* .leaflet-container svg: reset svg max-width decleration shipped in Joomla! (joomla.org) 3.x */
+/* .leaflet-container img: map is broken in FF if you have max-width: 100% on tiles */
+.leaflet-container .leaflet-overlay-pane svg {
+	max-width: none !important;
+	max-height: none !important;
+	}
+.leaflet-container .leaflet-marker-pane img,
+.leaflet-container .leaflet-shadow-pane img,
+.leaflet-container .leaflet-tile-pane img,
+.leaflet-container img.leaflet-image-layer,
+.leaflet-container .leaflet-tile {
+	max-width: none !important;
+	max-height: none !important;
+	width: auto;
+	padding: 0;
+	}
+
+.leaflet-container img.leaflet-tile {
+	/* See: https://bugs.chromium.org/p/chromium/issues/detail?id=600120 */
+	mix-blend-mode: plus-lighter;
+}
+
+.leaflet-container.leaflet-touch-zoom {
+	-ms-touch-action: pan-x pan-y;
+	touch-action: pan-x pan-y;
+	}
+.leaflet-container.leaflet-touch-drag {
+	-ms-touch-action: pinch-zoom;
+	/* Fallback for FF which doesn't support pinch-zoom */
+	touch-action: none;
+	touch-action: pinch-zoom;
+}
+.leaflet-container.leaflet-touch-drag.leaflet-touch-zoom {
+	-ms-touch-action: none;
+	touch-action: none;
+}
+.leaflet-container {
+	-webkit-tap-highlight-color: transparent;
+}
+.leaflet-container a {
+	-webkit-tap-highlight-color: rgba(51, 181, 229, 0.4);
+}
+.leaflet-tile {
+	filter: inherit;
+	visibility: hidden;
+	}
+.leaflet-tile-loaded {
+	visibility: inherit;
+	}
+.leaflet-zoom-box {
+	width: 0;
+	height: 0;
+	-moz-box-sizing: border-box;
+	     box-sizing: border-box;
+	z-index: 800;
+	}
+/* workaround for https://bugzilla.mozilla.org/show_bug.cgi?id=888319 */
+.leaflet-overlay-pane svg {
+	-moz-user-select: none;
+	}
+
+.leaflet-pane         { z-index: 400; }
+
+.leaflet-tile-pane    { z-index: 200; }
+.leaflet-overlay-pane { z-index: 400; }
+.leaflet-shadow-pane  { z-index: 500; }
+.leaflet-marker-pane  { z-index: 600; }
+.leaflet-tooltip-pane   { z-index: 650; }
+.leaflet-popup-pane   { z-index: 700; }
+
+.leaflet-map-pane canvas { z-index: 100; }
+.leaflet-map-pane svg    { z-index: 200; }
+
+.leaflet-vml-shape {
+	width: 1px;
+	height: 1px;
+	}
+.lvml {
+	behavior: url(#default#VML);
+	display: inline-block;
+	position: absolute;
+	}
+
+
+/* control positioning */
+
+.leaflet-control {
+	position: relative;
+	z-index: 800;
+	pointer-events: visiblePainted; /* IE 9-10 doesn't have auto */
+	pointer-events: auto;
+	}
+.leaflet-top,
+.leaflet-bottom {
+	position: absolute;
+	z-index: 1000;
+	pointer-events: none;
+	}
+.leaflet-top {
+	top: 0;
+	}
+.leaflet-right {
+	right: 0;
+	}
+.leaflet-bottom {
+	bottom: 0;
+	}
+.leaflet-left {
+	left: 0;
+	}
+.leaflet-control {
+	float: left;
+	clear: both;
+	}
+.leaflet-right .leaflet-control {
+	float: right;
+	}
+.leaflet-top .leaflet-control {
+	margin-top: 10px;
+	}
+.leaflet-bottom .leaflet-control {
+	margin-bottom: 10px;
+	}
+.leaflet-left .leaflet-control {
+	margin-left: 10px;
+	}
+.leaflet-right .leaflet-control {
+	margin-right: 10px;
+	}
+
+
+/* zoom and fade animations */
+
+.leaflet-fade-anim .leaflet-popup {
+	opacity: 0;
+	-webkit-transition: opacity 0.2s linear;
+	   -moz-transition: opacity 0.2s linear;
+	        transition: opacity 0.2s linear;
+	}
+.leaflet-fade-anim .leaflet-map-pane .leaflet-popup {
+	opacity: 1;
+	}
+.leaflet-zoom-animated {
+	-webkit-transform-origin: 0 0;
+	    -ms-transform-origin: 0 0;
+	        transform-origin: 0 0;
+	}
+svg.leaflet-zoom-animated {
+	will-change: transform;
+}
+
+.leaflet-zoom-anim .leaflet-zoom-animated {
+	-webkit-transition: -webkit-transform 0.25s cubic-bezier(0,0,0.25,1);
+	   -moz-transition:    -moz-transform 0.25s cubic-bezier(0,0,0.25,1);
+	        transition:         transform 0.25s cubic-bezier(0,0,0.25,1);
+	}
+.leaflet-zoom-anim .leaflet-tile,
+.leaflet-pan-anim .leaflet-tile {
+	-webkit-transition: none;
+	   -moz-transition: none;
+	        transition: none;
+	}
+
+.leaflet-zoom-anim .leaflet-zoom-hide {
+	visibility: hidden;
+	}
+
+
+/* cursors */
+
+.leaflet-interactive {
+	cursor: pointer;
+	}
+.leaflet-grab {
+	cursor: -webkit-grab;
+	cursor:    -moz-grab;
+	cursor:         grab;
+	}
+.leaflet-crosshair,
+.leaflet-crosshair .leaflet-interactive {
+	cursor: crosshair;
+	}
+.leaflet-popup-pane,
+.leaflet-control {
+	cursor: auto;
+	}
+.leaflet-dragging .leaflet-grab,
+.leaflet-dragging .leaflet-grab .leaflet-interactive,
+.leaflet-dragging .leaflet-marker-draggable {
+	cursor: move;
+	cursor: -webkit-grabbing;
+	cursor:    -moz-grabbing;
+	cursor:         grabbing;
+	}
+
+/* marker & overlays interactivity */
+.leaflet-marker-icon,
+.leaflet-marker-shadow,
+.leaflet-image-layer,
+.leaflet-pane > svg path,
+.leaflet-tile-container {
+	pointer-events: none;
+	}
+
+.leaflet-marker-icon.leaflet-interactive,
+.leaflet-image-layer.leaflet-interactive,
+.leaflet-pane > svg path.leaflet-interactive,
+svg.leaflet-image-layer.leaflet-interactive path {
+	pointer-events: visiblePainted; /* IE 9-10 doesn't have auto */
+	pointer-events: auto;
+	}
+
+/* visual tweaks */
+
+.leaflet-container {
+	background: #ddd;
+	outline-offset: 1px;
+	}
+.leaflet-container a {
+	color: #0078A8;
+	}
+.leaflet-zoom-box {
+	border: 2px dotted #38f;
+	background: rgba(255,255,255,0.5);
+	}
+
+
+/* general typography */
+.leaflet-container {
+	font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	font-size: 0.75rem;
+	line-height: 1.5;
+	}
+
+
+/* general toolbar styles */
+
+.leaflet-bar {
+	box-shadow: 0 1px 5px rgba(0,0,0,0.65);
+	border-radius: 4px;
+	}
+.leaflet-bar a {
+	background-color: #fff;
+	border-bottom: 1px solid #ccc;
+	width: 26px;
+	height: 26px;
+	line-height: 26px;
+	display: block;
+	text-align: center;
+	text-decoration: none;
+	color: black;
+	}
+.leaflet-bar a,
+.leaflet-control-layers-toggle {
+	background-position: 50% 50%;
+	background-repeat: no-repeat;
+	display: block;
+	}
+.leaflet-bar a:hover,
+.leaflet-bar a:focus {
+	background-color: #f4f4f4;
+	}
+.leaflet-bar a:first-child {
+	border-top-left-radius: 4px;
+	border-top-right-radius: 4px;
+	}
+.leaflet-bar a:last-child {
+	border-bottom-left-radius: 4px;
+	border-bottom-right-radius: 4px;
+	border-bottom: none;
+	}
+.leaflet-bar a.leaflet-disabled {
+	cursor: default;
+	background-color: #f4f4f4;
+	color: #bbb;
+	}
+
+.leaflet-touch .leaflet-bar a {
+	width: 30px;
+	height: 30px;
+	line-height: 30px;
+	}
+.leaflet-touch .leaflet-bar a:first-child {
+	border-top-left-radius: 2px;
+	border-top-right-radius: 2px;
+	}
+.leaflet-touch .leaflet-bar a:last-child {
+	border-bottom-left-radius: 2px;
+	border-bottom-right-radius: 2px;
+	}
+
+/* zoom control */
+
+.leaflet-control-zoom-in,
+.leaflet-control-zoom-out {
+	font: bold 18px 'Lucida Console', Monaco, monospace;
+	text-indent: 1px;
+	}
+
+.leaflet-touch .leaflet-control-zoom-in, .leaflet-touch .leaflet-control-zoom-out  {
+	font-size: 22px;
+	}
+
+
+/* layers control */
+
+.leaflet-control-layers {
+	box-shadow: 0 1px 5px rgba(0,0,0,0.4);
+	background: #fff;
+	border-radius: 5px;
+	}
+.leaflet-control-layers-toggle {
+	background-image: url(images/layers.png);
+	width: 36px;
+	height: 36px;
+	}
+.leaflet-retina .leaflet-control-layers-toggle {
+	background-image: url(images/layers-2x.png);
+	background-size: 26px 26px;
+	}
+.leaflet-touch .leaflet-control-layers-toggle {
+	width: 44px;
+	height: 44px;
+	}
+.leaflet-control-layers .leaflet-control-layers-list,
+.leaflet-control-layers-expanded .leaflet-control-layers-toggle {
+	display: none;
+	}
+.leaflet-control-layers-expanded .leaflet-control-layers-list {
+	display: block;
+	position: relative;
+	}
+.leaflet-control-layers-expanded {
+	padding: 6px 10px 6px 6px;
+	color: #333;
+	background: #fff;
+	}
+.leaflet-control-layers-scrollbar {
+	overflow-y: scroll;
+	overflow-x: hidden;
+	padding-right: 5px;
+	}
+.leaflet-control-layers-selector {
+	margin-top: 2px;
+	position: relative;
+	top: 1px;
+	}
+.leaflet-control-layers label {
+	display: block;
+	font-size: 13px;
+	font-size: 1.08333em;
+	}
+.leaflet-control-layers-separator {
+	height: 0;
+	border-top: 1px solid #ddd;
+	margin: 5px -10px 5px -6px;
+	}
+
+/* Default icon URLs */
+.leaflet-default-icon-path { /* used only in path-guessing heuristic, see L.Icon.Default */
+	background-image: url(images/marker-icon.png);
+	}
+
+
+/* attribution and scale controls */
+
+.leaflet-container .leaflet-control-attribution {
+	background: #fff;
+	background: rgba(255, 255, 255, 0.8);
+	margin: 0;
+	}
+.leaflet-control-attribution,
+.leaflet-control-scale-line {
+	padding: 0 5px;
+	color: #333;
+	line-height: 1.4;
+	}
+.leaflet-control-attribution a {
+	text-decoration: none;
+	}
+.leaflet-control-attribution a:hover,
+.leaflet-control-attribution a:focus {
+	text-decoration: underline;
+	}
+.leaflet-attribution-flag {
+	display: inline !important;
+	vertical-align: baseline !important;
+	width: 1em;
+	height: 0.6669em;
+	}
+.leaflet-left .leaflet-control-scale {
+	margin-left: 5px;
+	}
+.leaflet-bottom .leaflet-control-scale {
+	margin-bottom: 5px;
+	}
+.leaflet-control-scale-line {
+	border: 2px solid #777;
+	border-top: none;
+	line-height: 1.1;
+	padding: 2px 5px 1px;
+	white-space: nowrap;
+	-moz-box-sizing: border-box;
+	     box-sizing: border-box;
+	background: rgba(255, 255, 255, 0.8);
+	text-shadow: 1px 1px #fff;
+	}
+.leaflet-control-scale-line:not(:first-child) {
+	border-top: 2px solid #777;
+	border-bottom: none;
+	margin-top: -2px;
+	}
+.leaflet-control-scale-line:not(:first-child):not(:last-child) {
+	border-bottom: 2px solid #777;
+	}
+
+.leaflet-touch .leaflet-control-attribution,
+.leaflet-touch .leaflet-control-layers,
+.leaflet-touch .leaflet-bar {
+	box-shadow: none;
+	}
+.leaflet-touch .leaflet-control-layers,
+.leaflet-touch .leaflet-bar {
+	border: 2px solid rgba(0,0,0,0.2);
+	background-clip: padding-box;
+	}
+
+
+/* popup */
+
+.leaflet-popup {
+	position: absolute;
+	text-align: center;
+	margin-bottom: 20px;
+	}
+.leaflet-popup-content-wrapper {
+	padding: 1px;
+	text-align: left;
+	border-radius: 12px;
+	}
+.leaflet-popup-content {
+	margin: 13px 24px 13px 20px;
+	line-height: 1.3;
+	font-size: 13px;
+	font-size: 1.08333em;
+	min-height: 1px;
+	}
+.leaflet-popup-content p {
+	margin: 17px 0;
+	margin: 1.3em 0;
+	}
+.leaflet-popup-tip-container {
+	width: 40px;
+	height: 20px;
+	position: absolute;
+	left: 50%;
+	margin-top: -1px;
+	margin-left: -20px;
+	overflow: hidden;
+	pointer-events: none;
+	}
+.leaflet-popup-tip {
+	width: 17px;
+	height: 17px;
+	padding: 1px;
+
+	margin: -10px auto 0;
+	pointer-events: auto;
+
+	-webkit-transform: rotate(45deg);
+	   -moz-transform: rotate(45deg);
+	    -ms-transform: rotate(45deg);
+	        transform: rotate(45deg);
+	}
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+	background: white;
+	color: #333;
+	box-shadow: 0 3px 14px rgba(0,0,0,0.4);
+	}
+.leaflet-container a.leaflet-popup-close-button {
+	position: absolute;
+	top: 0;
+	right: 0;
+	border: none;
+	text-align: center;
+	width: 24px;
+	height: 24px;
+	font: 16px/24px Tahoma, Verdana, sans-serif;
+	color: #757575;
+	text-decoration: none;
+	background: transparent;
+	}
+.leaflet-container a.leaflet-popup-close-button:hover,
+.leaflet-container a.leaflet-popup-close-button:focus {
+	color: #585858;
+	}
+.leaflet-popup-scrolled {
+	overflow: auto;
+	}
+
+.leaflet-oldie .leaflet-popup-content-wrapper {
+	-ms-zoom: 1;
+	}
+.leaflet-oldie .leaflet-popup-tip {
+	width: 24px;
+	margin: 0 auto;
+
+	-ms-filter: "progid:DXImageTransform.Microsoft.Matrix(M11=0.70710678, M12=0.70710678, M21=-0.70710678, M22=0.70710678)";
+	filter: progid:DXImageTransform.Microsoft.Matrix(M11=0.70710678, M12=0.70710678, M21=-0.70710678, M22=0.70710678);
+	}
+
+.leaflet-oldie .leaflet-control-zoom,
+.leaflet-oldie .leaflet-control-layers,
+.leaflet-oldie .leaflet-popup-content-wrapper,
+.leaflet-oldie .leaflet-popup-tip {
+	border: 1px solid #999;
+	}
+
+
+/* div icon */
+
+.leaflet-div-icon {
+	background: #fff;
+	border: 1px solid #666;
+	}
+
+
+/* Tooltip */
+/* Base styles for the element that has a tooltip */
+.leaflet-tooltip {
+	position: absolute;
+	padding: 6px;
+	background-color: #fff;
+	border: 1px solid #fff;
+	border-radius: 3px;
+	color: #222;
+	white-space: nowrap;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	pointer-events: none;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+	}
+.leaflet-tooltip.leaflet-interactive {
+	cursor: pointer;
+	pointer-events: auto;
+	}
+.leaflet-tooltip-top:before,
+.leaflet-tooltip-bottom:before,
+.leaflet-tooltip-left:before,
+.leaflet-tooltip-right:before {
+	position: absolute;
+	pointer-events: none;
+	border: 6px solid transparent;
+	background: transparent;
+	content: "";
+	}
+
+/* Directions */
+
+.leaflet-tooltip-bottom {
+	margin-top: 6px;
+}
+.leaflet-tooltip-top {
+	margin-top: -6px;
+}
+.leaflet-tooltip-bottom:before,
+.leaflet-tooltip-top:before {
+	left: 50%;
+	margin-left: -6px;
+	}
+.leaflet-tooltip-top:before {
+	bottom: 0;
+	margin-bottom: -12px;
+	border-top-color: #fff;
+	}
+.leaflet-tooltip-bottom:before {
+	top: 0;
+	margin-top: -12px;
+	margin-left: -6px;
+	border-bottom-color: #fff;
+	}
+.leaflet-tooltip-left {
+	margin-left: -6px;
+}
+.leaflet-tooltip-right {
+	margin-left: 6px;
+}
+.leaflet-tooltip-left:before,
+.leaflet-tooltip-right:before {
+	top: 50%;
+	margin-top: -6px;
+	}
+.leaflet-tooltip-left:before {
+	right: 0;
+	margin-right: -12px;
+	border-left-color: #fff;
+	}
+.leaflet-tooltip-right:before {
+	left: 0;
+	margin-left: -12px;
+	border-right-color: #fff;
+	}
+
+/* Printing */
+
+@media print {
+	/* Prevent printers from removing background-images of controls. */
+	.leaflet-control {
+		-webkit-print-color-adjust: exact;
+		print-color-adjust: exact;
+		}
+	}
+
+/* Layout: Karte links (sticky), Tagesliste rechts; mobil Karte oben, Liste darunter */
+:root{
+  --bg:#f3f6f4; --surface:#ffffff; --fg:#17241f; --muted:#5d6e67; --line:#d6e0db;
+  --fern:#2f6b4f; --fern-soft:#e1ede6; --glacier:#2a7f9e; --glacier-soft:#dcedf3; --ochre:#b9822b;
+  --water:#cfe3ea; --land:#e9efe6; --landline:#a9bfb2; --route:#2f6b4f;
+  --f-display:"Young Serif", Georgia, "Times New Roman", serif;
+  --f-body:"Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f1714; --surface:#16211d; --fg:#e4ece8; --muted:#93a59d; --line:#2a3833;
+  --fern:#6fbf94; --fern-soft:#1d3329; --glacier:#6cc0de; --glacier-soft:#16303a; --ochre:#e0ad5a;
+  --water:#10242c; --land:#1c2a25; --landline:#3d5a4d; --route:#6fbf94; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1714; --surface:#16211d; --fg:#e4ece8; --muted:#93a59d; --line:#2a3833;
+  --fern:#6fbf94; --fern-soft:#1d3329; --glacier:#6cc0de; --glacier-soft:#16303a; --ochre:#e0ad5a;
+  --water:#10242c; --land:#1c2a25; --landline:#3d5a4d; --route:#6fbf94; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.5}
+a{color:var(--glacier)}
+a:focus-visible,button:focus-visible{outline:2px solid var(--glacier);outline-offset:2px}
+header.top{padding-block:28px 12px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));max-width:1400px;margin:0 auto}
+h1{font-family:var(--f-display);font-weight:400;font-size:clamp(28px,4vw,42px);line-height:1.1;margin:0;text-wrap:balance}
+.sub{color:var(--muted);margin:6px 0 0}
+.stats{display:flex;flex-wrap:wrap;gap:8px 22px;margin-top:14px;font-variant-numeric:tabular-nums}
+.stats b{font-size:18px;display:block}
+.stats span{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.06em}
+.wrap{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:24px;max-width:1400px;margin:0 auto;padding-block:8px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.mapcol{position:sticky;top:calc(12px + env(safe-area-inset-top,0px));height:calc(100vh - 24px);min-width:0}
+#map{height:100%;border-radius:14px;border:1px solid var(--line);background:var(--water)}
+.maptools{position:absolute;top:10px;right:10px;z-index:500;display:flex;gap:6px}
+.btn{font:600 13px var(--f-body);border:1px solid var(--line);background:var(--surface);color:var(--fg);border-radius:999px;padding:7px 12px;cursor:pointer}
+.btn:hover{border-color:var(--fern)}
+.legend{position:absolute;left:10px;bottom:10px;z-index:500;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:12px;display:flex;flex-direction:column;gap:4px}
+.lg{display:flex;align-items:center;gap:6px}
+.sw{width:12px;height:12px;border-radius:3px;background:var(--fern);display:inline-block}
+.sw.c{border-radius:50%;background:var(--ochre)}
+.sw.l{height:3px;border-radius:2px;background:var(--route)}
+.list{min-width:0;display:flex;flex-direction:column;gap:14px}
+.daynav{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);z-index:5;padding-top:6px}
+.daynav a{text-decoration:none;flex:0 0 auto;font:600 12px var(--f-body);border:1px solid var(--line);background:var(--surface);color:var(--fg);border-radius:8px;padding:6px 8px;cursor:pointer;font-variant-numeric:tabular-nums}
+.daynav a.on{background:var(--fern);color:var(--surface);border-color:var(--fern)}
+.day{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden;scroll-margin-top:56px}
+.day.on{border-color:var(--fern);box-shadow:0 0 0 2px var(--fern-soft)}
+.dhead{padding:14px 16px 10px;cursor:pointer;display:flex;flex-direction:column;gap:6px}
+.drow{display:flex;justify-content:space-between;gap:12px;align-items:baseline;flex-wrap:wrap}
+.dtitle{font-family:var(--f-display);font-size:20px}
+.dnum{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.08em}
+.dtot{font-variant-numeric:tabular-nums;font-weight:700}
+.bar{display:flex;height:6px;border-radius:4px;overflow:hidden;background:var(--line)}
+.bar i{display:block;height:100%}
+.bar .d{background:var(--glacier)} .bar .e{background:var(--fern)}
+.meta{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.meta .k1::before{content:"";display:inline-block;width:8px;height:8px;border-radius:2px;background:var(--glacier);margin-right:5px}
+.meta .k2::before{content:"";display:inline-block;width:8px;height:8px;border-radius:2px;background:var(--fern);margin-right:5px}
+.night{font-size:13px;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.night .tag{font-size:11px;text-transform:uppercase;letter-spacing:.06em;background:var(--fern-soft);color:var(--fern);padding:2px 7px;border-radius:999px;font-weight:700}
+.items{list-style:none;margin:0;padding:0 16px 12px;display:flex;flex-direction:column}
+.it{display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:10px;padding:9px 0;border-top:1px solid var(--line);align-items:start}
+.it .t{font-variant-numeric:tabular-nums;font-weight:700;font-size:14px}
+.it .nm{font-weight:600}
+.it .inf{font-size:13px;color:var(--muted)}
+.it .km{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.it.drive{grid-template-columns:52px minmax(0,1fr) auto;padding:5px 0}
+.it.drive .nm{font-weight:500;color:var(--muted);font-size:13px}
+.it.drive .t{color:var(--glacier);font-weight:600;font-size:13px}
+.badge{display:inline-block;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:1px 6px;border-radius:4px;margin-right:6px;vertical-align:1px}
+.b-hike{background:var(--fern-soft);color:var(--fern)} .b-stop{background:var(--glacier-soft);color:var(--glacier)} .b-boat{background:var(--glacier-soft);color:var(--glacier)}
+.b-opt{border:1px solid var(--line);color:var(--muted)}
+.gm{font-size:12px;font-weight:600;white-space:nowrap;text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:4px 9px;color:var(--glacier)}
+.gm:hover{border-color:var(--glacier)}
+.lk{display:flex;flex-direction:column;gap:4px;align-items:flex-end}
+.gm.at{color:var(--fern)}
+.gm.at:hover{border-color:var(--fern)}
+.dfoot{padding:0 16px 14px;display:flex;gap:8px;flex-wrap:wrap}
+.leaflet-container{font-family:var(--f-body);background:var(--water)}
+.leaflet-popup-content-wrapper,.leaflet-popup-tip{background:var(--surface);color:var(--fg)}
+.leaflet-popup-content{margin:10px 12px;font-size:13px}
+.pin{width:24px;height:24px;border-radius:7px;background:var(--fern);color:var(--surface);font:700 12px var(--f-body);display:flex;align-items:center;justify-content:center;border:2px solid var(--surface);box-shadow:0 1px 3px rgba(0,0,0,.3)}
+.pin.on{background:var(--ochre)}
+.note{color:var(--muted);font-size:12.5px;max-width:65ch}
+@media (max-width:900px){
+  .wrap{grid-template-columns:minmax(0,1fr)}
+  .mapcol{position:relative;top:0;height:56vh}
+}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+
+
+<header class="top">
+  <h1>Südinsel Roadtrip 2027</h1>
+  <p class="sub">31. Januar bis 26. Februar · Picton → Christchurch · zu dritt mit Mietwagen</p>
+  <div class="stats" id="stats"></div>
+</header>
+
+<div class="wrap">
+  <div class="mapcol">
+    <div id="map" role="region" aria-label="Karte der Route"></div>
+    <div class="maptools"><button class="btn" id="allbtn" type="button">Ganze Route</button></div>
+    <div class="legend">
+      <div class="lg"><span class="sw"></span>Unterkunft (Nummer = Reihenfolge)</div>
+      <div class="lg"><span class="sw c"></span>Ziel / Wanderung</div>
+      <div class="lg"><span class="sw l"></span>Route zwischen Unterkünften</div>
+    </div>
+  </div>
+  <div class="list">
+    <nav class="daynav" id="daynav" aria-label="Tage"></nav>
+    <div id="days"></div>
+    <p class="note">Fahrzeiten aus der Roadtrippers-Route geschätzt. Stopps mit 50 %, Wanderungen mit 20 % Puffer, ohne Mittagspause. Tagessummen enthalten optionale Punkte. „Maps“ öffnet den Ort in Google Maps, „AllTrails“ die Wanderung auf AllTrails.</p>
+  </div>
+</div>
+
+<script src="leaflet.js"></script>
+<script>
+const DAYS=[{"d": "So 31.01.2027", "acc": {"n": "Smith's Farm Holiday Park", "lat": -41.289, "lng": 173.888, "q": "Smiths Farm Holiday Park Linkwater"}, "from": {"n": "Picton (Fähre)", "lat": -41.285, "lng": 174.005}, "items": [{"n": "Ankunft Fähre in Picton", "k": "stop", "m": null, "km": null, "i": "Ankunftszeit je nach gebuchter Fähre", "dr": false, "opt": false, "lat": -41.285, "lng": 174.005, "q": "Interislander Picton Terminal"}, {"n": "Fahrt Fährterminal → Snout Track", "k": "drive", "m": 10, "km": 4.2, "i": "", "dr": true, "opt": false}, {"n": "Snout Track & Lower Bob's Bay Loop", "k": "hike", "m": 110, "km": 3.9, "i": "Nach der Fähre; längere Variante: Snout Track Loop 9,2 km", "dr": false, "opt": false, "lat": -41.274, "lng": 174.02, "q": "Snout Track Picton", "at": ["https://www.alltrails.com/trail/new-zealand/marlborough/snout-track-and-lower-bobs-bay-track-loop"]}, {"n": "Fahrt → Smith's Farm (Einchecken)", "k": "drive", "m": 30, "km": 22.7, "i": "Nachmittag", "dr": true, "opt": false}, {"n": "Fahrt Smith's Farm → Cullen Point", "k": "drive", "m": 15, "km": 11, "i": "Spätnachmittag", "dr": true, "opt": false}, {"n": "Cullen Point Lookout Track", "k": "hike", "m": 35, "km": 1.1, "i": "Blick über Havelock und den Pelorus Sound", "dr": false, "opt": false, "lat": -41.269, "lng": 173.785, "q": "Cullen Point Lookout Havelock", "at": ["https://www.alltrails.com/trail/new-zealand/marlborough/cullen-point-lookout-track"]}, {"n": "Fahrt → Smith's Farm", "k": "drive", "m": 15, "km": 11, "i": "Abend", "dr": true, "opt": false}]}, {"d": "Mo 01.02.2027", "acc": {"n": "Smith's Farm Holiday Park", "lat": -41.289, "lng": 173.888, "q": "Smiths Farm Holiday Park Linkwater"}, "from": {"n": "Smith's Farm Holiday Park", "lat": -41.289, "lng": 173.888}, "items": [{"n": "Queen Charlotte Drive: Smith's Farm → Anakiwa mit Aussichtspunkten", "k": "drive", "m": 15, "km": 5, "i": "Vormittag; die Panoramastraße Picton–Havelock, an der Smith's Farm liegt", "dr": true, "opt": false}, {"n": "Queen Charlotte Track: Mistletoe Bay → Anakiwa", "k": "hike", "m": 290, "km": 13.5, "i": "Vormittag bis Nachmittag; Einwegstrecke – Rücktransport vorab klären oder ab Anakiwa hin und zurück bis zum Wendepunkt eurer Wahl", "dr": false, "opt": false, "lat": -41.264, "lng": 173.923, "q": "Anakiwa Queen Charlotte Track", "at": ["https://www.alltrails.com/trail/new-zealand/marlborough/anakiwa-to-mistletoe-bay-via-queen-charlotte-track"]}, {"n": "Queen Charlotte Drive: Anakiwa → Picton", "k": "drive", "m": 30, "km": 25, "i": "Nachmittag; Stopps an den Lookouts", "dr": true, "opt": false}, {"n": "Picton: Hafen & Uferpromenade", "k": "stop", "m": 90, "km": null, "i": "Spätnachmittag", "dr": false, "opt": false, "lat": -41.29, "lng": 174.006, "q": "Picton Foreshore"}, {"n": "Fahrt Picton → Smith's Farm", "k": "drive", "m": 30, "km": 25, "i": "Abend; Alternative für den ganzen Tag: Ship Cove → Furneaux Lodge mit Wassertaxi ab Picton", "dr": true, "opt": false}]}, {"d": "Di 02.02.2027", "acc": {"n": "Motueka Garden Motel", "lat": -41.11, "lng": 173.012, "q": "Motueka Garden Motel"}, "from": {"n": "Smith's Farm Holiday Park", "lat": -41.289, "lng": 173.888}, "items": [{"n": "Fahrt Smith's Farm → Pelorus Bridge", "k": "drive", "m": 35, "km": 33.8, "i": "Vormittag", "dr": true, "opt": false}, {"n": "Pelorus Bridge: Baden & kurze Waldwege", "k": "stop", "m": 90, "km": null, "i": "Badesachen griffbereit", "dr": false, "opt": false, "lat": -41.299, "lng": 173.573, "q": "Pelorus Bridge Scenic Reserve"}, {"n": "Fahrt → Cable Bay", "k": "drive", "m": 50, "km": 48.2, "i": "", "dr": true, "opt": false}, {"n": "Cable Bay Walkway zum Sentinel Lookout", "k": "hike", "m": 70, "km": 2.1, "i": "Mittag", "dr": false, "opt": false, "lat": -41.161, "lng": 173.414, "q": "Cable Bay Walkway Nelson", "at": ["https://www.alltrails.com/trail/new-zealand/nelson-tasman/cable-bay-walkway-to-sentinel-lookout"]}, {"n": "Fahrt → Riwaka Resurgence", "k": "drive", "m": 80, "km": 85.6, "i": "Nachmittag", "dr": true, "opt": false}, {"n": "Riwaka Resurgence", "k": "hike", "m": 35, "km": 0.6, "i": "Quelltopf, kurzer Waldweg", "dr": false, "opt": false, "lat": -41.034, "lng": 172.901, "q": "Riwaka Resurgence", "at": ["https://www.alltrails.com/trail/new-zealand/nelson-tasman/te-puna-wai-o-riuwaka-resurgence-walk"]}, {"n": "Fahrt → Motueka Garden Motel", "k": "drive", "m": 15, "km": 12, "i": "", "dr": true, "opt": false}]}, {"d": "Mi 03.02.2027", "acc": {"n": "Motueka Garden Motel", "lat": -41.11, "lng": 173.012, "q": "Motueka Garden Motel"}, "from": {"n": "Motueka Garden Motel", "lat": -41.11, "lng": 173.012}, "items": [{"n": "Fahrt Motueka → Marahau", "k": "drive", "m": 25, "km": 18, "i": "Früh los – rechtzeitig vor der ersten Abfahrt am Anleger sein", "dr": true, "opt": false}, {"n": "Wassertaxi Marahau → Anchorage", "k": "boat", "m": 45, "km": null, "i": "Früheste Abfahrt buchen", "dr": true, "opt": false}, {"n": "Abel Tasman Coast Track: Anchorage → Bark Bay", "k": "hike", "m": 290, "km": 12, "i": "Vormittag bis Nachmittag; Abkürzung durch Torrent Bay nur ca. 2 h um Niedrigwasser, sonst High-Tide-Track (länger); Falls River Swing Bridge", "dr": false, "opt": false, "lat": -40.96, "lng": 173.04, "q": "Anchorage Bay Abel Tasman", "at": ["https://www.alltrails.com/de/explore/trail/new-zealand/nelson-tasman/abel-tasman-coast-track-anchorage-to-bark-bay"]}, {"n": "Cleopatra's Pool: Baden & Felsrutsche", "k": "stop", "m": 70, "km": null, "i": "Kurzer Abstecher am Anfang der Etappe – Badesachen einpacken", "dr": false, "opt": false, "lat": -40.95, "lng": 173.043, "q": "Cleopatra's Pool Abel Tasman"}, {"n": "Wassertaxi Bark Bay → Marahau", "k": "boat", "m": 60, "km": null, "i": "Späteste Abholung buchen – Abholzeit nicht verpassen", "dr": true, "opt": false}, {"n": "Fahrt Marahau → Split Apple Rock", "k": "drive", "m": 10, "km": 6.4, "i": "Wenn noch Zeit ist", "dr": true, "opt": false}, {"n": "Split Apple Rock", "k": "stop", "m": 45, "km": null, "i": "Bei Ebbe näher am Felsen", "dr": false, "opt": false, "lat": -41.018, "lng": 173.02, "q": "Split Apple Rock"}, {"n": "Fahrt → Motueka Garden Motel", "k": "drive", "m": 25, "km": 20, "i": "", "dr": true, "opt": false}]}, {"d": "Do 04.02.2027", "acc": {"n": "Motueka Garden Motel", "lat": -41.11, "lng": 173.012, "q": "Motueka Garden Motel"}, "from": {"n": "Motueka Garden Motel", "lat": -41.11, "lng": 173.012}, "items": [{"n": "Fahrt Motueka → Te Waikoropupū Springs", "k": "drive", "m": 70, "km": 62, "i": "Früh starten, Takaka Hill ist kurvig", "dr": true, "opt": false}, {"n": "Te Waikoropupū Springs Walk", "k": "stop", "m": 70, "km": 1.0, "i": "Vormittag", "dr": false, "opt": false, "lat": -40.849, "lng": 172.77, "q": "Te Waikoropupū Springs", "at": ["https://www.alltrails.com/trail/new-zealand/nelson-tasman/te-waikoropupu-springs-walk"]}, {"n": "Fahrt → Wharariki Beach", "k": "drive", "m": 60, "km": 54.2, "i": "", "dr": true, "opt": false}, {"n": "Wharariki Beach Loop", "k": "hike", "m": 145, "km": 4.5, "i": "Mittag; bei Ebbe Robbenbabys in den Felspools", "dr": false, "opt": false, "lat": -40.504, "lng": 172.674, "q": "Wharariki Beach", "at": ["https://www.alltrails.com/trail/new-zealand/nelson-tasman/wharariki-beach-loop"]}, {"n": "Fahrt → The Grove", "k": "drive", "m": 60, "km": 61.7, "i": "Nachmittag", "dr": true, "opt": false}, {"n": "The Grove Scenic Reserve", "k": "stop", "m": 45, "km": null, "i": "Felsspalten, kurzer Rundweg", "dr": false, "opt": false, "lat": -40.848, "lng": 172.871, "q": "The Grove Scenic Reserve Takaka"}, {"n": "Fahrt → Labyrinth Rocks", "k": "drive", "m": 10, "km": 5.9, "i": "", "dr": true, "opt": false}, {"n": "Labyrinth Rocks Park", "k": "stop", "m": 70, "km": null, "i": "Versteckte Spielfiguren suchen", "dr": false, "opt": false, "lat": -40.851, "lng": 172.824, "q": "Labyrinth Rocks Park Takaka"}, {"n": "Fahrt → Motueka Garden Motel", "k": "drive", "m": 70, "km": 58, "i": "Längster Fahrtag der Reise", "dr": true, "opt": false}]}, {"d": "Fr 05.02.2027", "acc": {"n": "Punakaiki Beach Camp", "lat": -42.107, "lng": 171.333, "q": "Punakaiki Beach Camp"}, "from": {"n": "Motueka Garden Motel", "lat": -41.11, "lng": 173.012}, "items": [{"n": "Fahrt Motueka → Kawatiri (über Motueka Valley)", "k": "drive", "m": 80, "km": 90, "i": "Vormittag – Koffer abgedeckt im Kofferraum, Wertsachen in den Tagesrucksack", "dr": true, "opt": false}, {"n": "Kawatiri Historic Railway Walk", "k": "hike", "m": 55, "km": 1.6, "i": "Tunnel – Taschenlampe mitnehmen", "dr": false, "opt": false, "lat": -41.694, "lng": 172.617, "q": "Kawatiri Historic Railway Walk", "at": ["https://www.alltrails.com/trail/new-zealand/nelson-tasman/kawatiri-historic-railway-walk"]}, {"n": "Fahrt → Cape Foulwind", "k": "drive", "m": 110, "km": 141.6, "i": "", "dr": true, "opt": false}, {"n": "Cape Foulwind Walkway bis Tauranga Bay", "k": "hike", "m": 125, "km": 6.0, "i": "Mittag; Robbenkolonie am Ende. Kürzer mit Gepäck im Auto: nur Tauranga Bay → Robben-Aussichtspunkt (30 min)", "dr": false, "opt": false, "lat": -41.773, "lng": 171.453, "q": "Tauranga Bay Seal Colony", "at": ["https://www.alltrails.com/trail/new-zealand/west-coast/cape-foulwind-walkway-from-lighthouse-road"]}, {"n": "Fahrt → Mitchells Gully", "k": "drive", "m": 25, "km": 27.2, "i": "Nachmittag", "dr": true, "opt": false}, {"n": "Mitchells Gully Gold Mine", "k": "stop", "m": 70, "km": 0.8, "i": "Vorher prüfen, ob geöffnet", "dr": false, "opt": false, "lat": -41.891, "lng": 171.467, "q": "Mitchells Gully Gold Mine"}, {"n": "Fahrt → Little Cave (Fox River)", "k": "drive", "m": 20, "km": 22, "i": "", "dr": true, "opt": false}, {"n": "Little Cave", "k": "stop", "m": 90, "km": null, "i": "Spätnachmittag", "dr": false, "opt": false, "lat": -42.031, "lng": 171.382, "q": "Fox River Cave Walk"}, {"n": "Fahrt → Irimahuwhero Viewpoint", "k": "drive", "m": 10, "km": 6.6, "i": "", "dr": true, "opt": false}, {"n": "Irimahuwhero Viewpoint", "k": "stop", "m": 20, "km": null, "i": "Abendlicht über der Küste", "dr": false, "opt": false, "lat": -42.075, "lng": 171.355, "q": "Irimahuwhero Viewpoint"}, {"n": "Fahrt → Punakaiki", "k": "drive", "m": 10, "km": 7, "i": "Einchecken", "dr": true, "opt": false}]}, {"d": "Sa 06.02.2027", "acc": {"n": "Punakaiki Beach Camp", "lat": -42.107, "lng": 171.333, "q": "Punakaiki Beach Camp"}, "from": {"n": "Punakaiki Beach Camp", "lat": -42.107, "lng": 171.333}, "items": [{"n": "Punakaiki Loop (Pororari River & Inland Pack Track)", "k": "hike", "m": 395, "km": 17, "i": "Ganzer Tag ab Unterkunft; kürzer: Pororari River Loop 11 km", "dr": false, "opt": false, "lat": -42.1, "lng": 171.34, "q": "Pororari River Track", "at": ["https://www.alltrails.com/trail/new-zealand/west-coast/punakaiki-loop"]}, {"n": "Pancake Rocks & Blowholes", "k": "stop", "m": 70, "km": 1.0, "i": "Abend, möglichst bei Flut", "dr": false, "opt": false, "lat": -42.115, "lng": 171.33, "q": "Pancake Rocks and Blowholes", "at": ["https://www.alltrails.com/trail/new-zealand/west-coast/punakaiki-pancake-rocks-and-blowholes-loop"]}]}, {"d": "So 07.02.2027", "acc": {"n": "Jade Motor Lodge, Hokitika", "lat": -42.715, "lng": 170.968, "q": "Jade Motor Lodge Hokitika"}, "from": {"n": "Punakaiki Beach Camp", "lat": -42.107, "lng": 171.333}, "items": [{"n": "Fahrt Punakaiki → Truman Track", "k": "drive", "m": 5, "km": 3.3, "i": "Früh morgens", "dr": true, "opt": false}, {"n": "Truman Track", "k": "hike", "m": 35, "km": 1.5, "i": "Morgens", "dr": false, "opt": false, "lat": -42.093, "lng": 171.341, "q": "Truman Track Punakaiki", "at": ["https://www.alltrails.com/trail/new-zealand/west-coast/truman-track"]}, {"n": "Fahrt → Punakaiki (Unterkunft)", "k": "drive", "m": 5, "km": 3.3, "i": "", "dr": true, "opt": false}, {"n": "Auschecken & Koffer einladen", "k": "stop", "m": 30, "km": null, "i": "Koffer abgedeckt verstauen", "dr": false, "opt": false}, {"n": "Fahrt → Motukiekie Beach", "k": "drive", "m": 25, "km": 24, "i": "Vormittag – Zeit nach Gezeiten wählen", "dr": true, "opt": false}, {"n": "Motukiekie Beach Walk", "k": "hike", "m": 110, "km": 3.4, "i": "Nur bei Ebbe begehbar; Auto mit Gepäck – Wertsachen mitnehmen", "dr": false, "opt": false, "lat": -42.312, "lng": 171.281, "q": "Motukiekie Beach", "at": ["https://www.alltrails.com/trail/new-zealand/west-coast/motukiekie-beach-walk"]}, {"n": "Fahrt → Greymouth", "k": "drive", "m": 25, "km": 21, "i": "Mittag", "dr": true, "opt": false}, {"n": "Pounamu Pathway & Kowhai Bush Walk", "k": "stop", "m": 110, "km": 0.8, "i": "", "dr": false, "opt": false, "lat": -42.449, "lng": 171.211, "q": "Pounamu Pathway Greymouth"}, {"n": "Fahrt → Shantytown", "k": "drive", "m": 15, "km": 11.9, "i": "Nachmittag", "dr": true, "opt": false}, {"n": "Shantytown Heritage Park", "k": "stop", "m": 225, "km": null, "i": "Goldwaschen, Dampflok", "dr": false, "opt": false, "lat": -42.535, "lng": 171.182, "q": "Shantytown Heritage Park"}, {"n": "Fahrt → Hokitika", "k": "drive", "m": 25, "km": 30, "i": "Einchecken", "dr": true, "opt": false}]}, {"d": "Mo 08.02.2027", "acc": {"n": "Jade Motor Lodge, Hokitika", "lat": -42.715, "lng": 170.968, "q": "Jade Motor Lodge Hokitika"}, "from": {"n": "Jade Motor Lodge, Hokitika", "lat": -42.715, "lng": 170.968}, "items": [{"n": "Fahrt Hokitika → Devils Punchbowl Falls", "k": "drive", "m": 80, "km": 100, "i": "Früh los", "dr": true, "opt": false}, {"n": "Devils Punchbowl Walking Track", "k": "hike", "m": 70, "km": 2.1, "i": "Vormittag", "dr": false, "opt": false, "lat": -42.933, "lng": 171.567, "q": "Devils Punchbowl Falls", "at": ["https://www.alltrails.com/trail/new-zealand/canterbury/devils-punchbowl-walking-track"]}, {"n": "Fahrt → Bealey Spur", "k": "drive", "m": 15, "km": 12, "i": "", "dr": true, "opt": false}, {"n": "Bealey Spur Track", "k": "hike", "m": 325, "km": 12.6, "i": "Vormittag bis Nachmittag; kürzer: nur bis Power View", "dr": false, "opt": false, "lat": -43.02, "lng": 171.6, "q": "Bealey Spur Track", "at": ["https://www.alltrails.com/trail/new-zealand/canterbury/bealey-spur-track"]}, {"n": "Fahrt → Cave Stream (optional)", "k": "drive", "m": 35, "km": 40, "i": "Nachmittag", "dr": true, "opt": true}, {"n": "Cave Stream Loop (optional)", "k": "stop", "m": 90, "km": 1.0, "i": "Nasse Füße, Stirnlampe, nur bei niedrigem Wasserstand", "dr": false, "opt": true, "lat": -43.197, "lng": 171.741, "q": "Cave Stream Scenic Reserve", "at": ["https://www.alltrails.com/trail/new-zealand/canterbury/cave-stream-loop-track"]}, {"n": "Fahrt → Hokitika", "k": "drive", "m": 125, "km": 140, "i": "Ohne Cave Stream ca. 1:35", "dr": true, "opt": false}]}, {"d": "Di 09.02.2027", "acc": {"n": "Jade Motor Lodge, Hokitika", "lat": -42.715, "lng": 170.968, "q": "Jade Motor Lodge Hokitika"}, "from": {"n": "Jade Motor Lodge, Hokitika", "lat": -42.715, "lng": 170.968}, "items": [{"n": "Fahrt Hokitika → Tunnel Terrace Walk", "k": "drive", "m": 15, "km": 12, "i": "Vormittag", "dr": true, "opt": false}, {"n": "Tunnel Terrace Walk", "k": "hike", "m": 35, "km": 1.3, "i": "Stirnlampe für den Tunnel", "dr": false, "opt": false, "lat": -42.675, "lng": 171.118, "q": "Tunnel Terrace Walk", "at": ["https://www.alltrails.com/trail/new-zealand/west-coast/tunnel-terrace-walk"]}, {"n": "Fahrt → Westland Industrial Heritage Park", "k": "drive", "m": 10, "km": 8, "i": "", "dr": true, "opt": false}, {"n": "Westland Industrial Heritage Park", "k": "stop", "m": 70, "km": null, "i": "", "dr": false, "opt": false, "lat": -42.716, "lng": 170.985, "q": "Westland Industrial Heritage Park"}, {"n": "Fahrt → Westcoast Treetop Walk", "k": "drive", "m": 20, "km": 19, "i": "Mittag", "dr": true, "opt": false}, {"n": "Westcoast Treetop Walk & Cafe", "k": "stop", "m": 135, "km": null, "i": "", "dr": false, "opt": false, "lat": -42.811, "lng": 170.923, "q": "West Coast Treetop Walk"}, {"n": "Fahrt → Hokitika Beach Sign", "k": "drive", "m": 20, "km": 20, "i": "Spätnachmittag", "dr": true, "opt": false}, {"n": "Hokitika Beach & Beach Sign", "k": "stop", "m": 45, "km": null, "i": "Zum Sonnenuntergang", "dr": false, "opt": false, "lat": -42.717, "lng": 170.96, "q": "Hokitika Beach Sign"}, {"n": "Fahrt → Hokitika Glow Worm Dell", "k": "drive", "m": 5, "km": 2, "i": "", "dr": true, "opt": false}, {"n": "Hokitika Glow Worm Dell", "k": "stop", "m": 30, "km": null, "i": "Erst nach Einbruch der Dunkelheit, ca. 22 Uhr", "dr": false, "opt": false, "lat": -42.708, "lng": 170.975, "q": "Hokitika Glow Worm Dell"}, {"n": "Fahrt → Unterkunft Hokitika", "k": "drive", "m": 5, "km": 2, "i": "Spät abends", "dr": true, "opt": false}]}, {"d": "Mi 10.02.2027", "acc": {"n": "Jade Motor Lodge, Hokitika", "lat": -42.715, "lng": 170.968, "q": "Jade Motor Lodge Hokitika"}, "from": {"n": "Jade Motor Lodge, Hokitika", "lat": -42.715, "lng": 170.968}, "items": [{"n": "Fahrt Hokitika → Carew Falls", "k": "drive", "m": 45, "km": 45, "i": "Vormittag", "dr": true, "opt": false}, {"n": "Carew Falls Walk", "k": "hike", "m": 70, "km": 1.9, "i": "", "dr": false, "opt": false, "lat": -42.644, "lng": 171.4, "q": "Carew Falls", "at": ["https://www.alltrails.com/trail/new-zealand/west-coast/carew-falls-walk"]}, {"n": "Fahrt → Dorothy Falls (Lake Kaniere)", "k": "drive", "m": 60, "km": 70, "i": "", "dr": true, "opt": false}, {"n": "Dorothy Falls", "k": "stop", "m": 30, "km": null, "i": "Mittag", "dr": false, "opt": false, "lat": -42.843, "lng": 171.167, "q": "Dorothy Falls Lake Kaniere"}, {"n": "Fahrt → Hokitika Gorge", "k": "drive", "m": 45, "km": 36, "i": "", "dr": true, "opt": false}, {"n": "Hokitika Gorge", "k": "hike", "m": 70, "km": 2.25, "i": "Nachmittag – bei Sonne leuchtet das Wasser türkis", "dr": false, "opt": false, "lat": -42.956, "lng": 171.017, "q": "Hokitika Gorge", "at": ["https://www.alltrails.com/trail/new-zealand/west-coast/hokitika-gorge-walk"]}, {"n": "Fahrt → Hokitika", "k": "drive", "m": 35, "km": 33, "i": "", "dr": true, "opt": false}]}, {"d": "Do 11.02.2027", "acc": {"n": "Franz Josef (Unterkunft suchen)", "lat": -43.389, "lng": 170.183, "q": "Franz Josef Glacier township"}, "from": {"n": "Jade Motor Lodge, Hokitika", "lat": -42.715, "lng": 170.968}, "items": [{"n": "Fahrt Hokitika → Whataroa", "k": "drive", "m": 80, "km": 100, "i": "Vormittag", "dr": true, "opt": false}, {"n": "Whataroa River", "k": "stop", "m": 30, "km": null, "i": "", "dr": false, "opt": false, "lat": -43.298, "lng": 170.41, "q": "Whataroa"}, {"n": "Fahrt → Okarito", "k": "drive", "m": 30, "km": 31.4, "i": "", "dr": true, "opt": false}, {"n": "Okarito Trig Walk", "k": "hike", "m": 110, "km": null, "i": "Mittag; Blick auf Lagune, Gletscher und Meer", "dr": false, "opt": false, "lat": -43.224, "lng": 170.162, "q": "Okarito Trig Walk", "at": ["https://www.alltrails.com/trail/new-zealand/west-coast/okarito-trig-walk"]}, {"n": "Fahrt → Lake Mapourika", "k": "drive", "m": 20, "km": 19, "i": "Nachmittag", "dr": true, "opt": false}, {"n": "Lake Mapourika", "k": "stop", "m": 45, "km": null, "i": "", "dr": false, "opt": false, "lat": -43.317, "lng": 170.2, "q": "Lake Mapourika"}, {"n": "Fahrt → Callery Gorge", "k": "drive", "m": 15, "km": 12.1, "i": "", "dr": true, "opt": false}, {"n": "Callery Gorge Walk", "k": "hike", "m": 110, "km": null, "i": "", "dr": false, "opt": false, "lat": -43.389, "lng": 170.189, "q": "Callery Gorge Walk", "at": ["https://www.alltrails.com/trail/new-zealand/west-coast/callery-gorge"]}, {"n": "Terrace Walk", "k": "hike", "m": 25, "km": 1.0, "i": "Abend in Franz Josef", "dr": false, "opt": false, "lat": -43.385, "lng": 170.18, "q": "Terrace Walk Franz Josef", "at": ["https://www.alltrails.com/trail/new-zealand/west-coast/terrace-walk"]}]}, {"d": "Fr 12.02.2027", "acc": {"n": "Franz Josef (Unterkunft suchen)", "lat": -43.389, "lng": 170.183, "q": "Franz Josef Glacier township"}, "from": {"n": "Franz Josef (Unterkunft suchen)", "lat": -43.389, "lng": 170.183}, "items": [{"n": "Alex Knob Track", "k": "hike", "m": 505, "km": 15.9, "i": "Ganzer Tag, nur bei klarer Sicht; Alternative bei Wolken: Roberts Point Track 11 km", "dr": false, "opt": false, "lat": -43.4, "lng": 170.17, "q": "Alex Knob Track", "at": ["https://www.alltrails.com/trail/new-zealand/west-coast/alex-knob-and-christmas-lookout-via-alex-knob-track"]}, {"n": "Franz Josef Glacier Valley Walk", "k": "hike", "m": 70, "km": null, "i": "Nachmittag oder Abend", "dr": false, "opt": false, "lat": -43.423, "lng": 170.169, "q": "Franz Josef Glacier Valley Walk", "at": ["https://www.alltrails.com/trail/new-zealand/west-coast/franz-josef-glacier-walk"]}]}, {"d": "Sa 13.02.2027", "acc": {"n": "Mountainview Makarora Accommodation", "lat": -44.232, "lng": 169.229, "q": "Mountainview Makarora"}, "from": {"n": "Franz Josef (Unterkunft suchen)", "lat": -43.389, "lng": 170.183}, "items": [{"n": "Fahrt Franz Josef → Lake Matheson", "k": "drive", "m": 30, "km": 33.8, "i": "Früh morgens für die Spiegelung", "dr": true, "opt": false}, {"n": "Lake Matheson Walk & Peak View Point", "k": "hike", "m": 110, "km": null, "i": "Vormittag", "dr": false, "opt": false, "lat": -43.447, "lng": 169.969, "q": "Lake Matheson", "at": ["https://www.alltrails.com/trail/new-zealand/west-coast/lake-matheson-walk"]}, {"n": "Fahrt → Fox Glacier South Side", "k": "drive", "m": 15, "km": 12, "i": "", "dr": true, "opt": false}, {"n": "Fox Glacier South Side (optional)", "k": "hike", "m": 145, "km": 6.4, "i": "Vormittag", "dr": false, "opt": true, "lat": -43.479, "lng": 170.007, "q": "Fox Glacier South Side Walk", "at": ["https://www.alltrails.com/trail/new-zealand/west-coast/fox-glacier-south-side-walkway-cycleway"]}, {"n": "Fahrt → Ship Creek", "k": "drive", "m": 90, "km": 106, "i": "Mittag", "dr": true, "opt": false}, {"n": "Ship Creek", "k": "hike", "m": 35, "km": null, "i": "", "dr": false, "opt": false, "lat": -43.758, "lng": 169.147, "q": "Ship Creek Walk Haast", "at": ["https://www.alltrails.com/trail/new-zealand/west-coast/ship-creek-beach-walk"]}, {"n": "Fahrt → Roaring Billy Falls", "k": "drive", "m": 35, "km": 44.3, "i": "Nachmittag", "dr": true, "opt": false}, {"n": "Roaring Billy Falls Walk", "k": "hike", "m": 35, "km": null, "i": "", "dr": false, "opt": false, "lat": -43.939, "lng": 169.285, "q": "Roaring Billy Falls", "at": ["https://www.alltrails.com/trail/new-zealand/west-coast/roaring-billy-falls"]}, {"n": "Fahrt → Thunder Creek Falls", "k": "drive", "m": 25, "km": 22.9, "i": "", "dr": true, "opt": false}, {"n": "Thunder Creek & Fantail Falls", "k": "stop", "m": 45, "km": null, "i": "", "dr": false, "opt": false, "lat": -44.038, "lng": 169.365, "q": "Thunder Creek Falls"}, {"n": "Fahrt → Haast Pass Lookout", "k": "drive", "m": 5, "km": 4.6, "i": "", "dr": true, "opt": false}, {"n": "Haast Pass Lookout", "k": "stop", "m": 20, "km": null, "i": "", "dr": false, "opt": false, "lat": -44.108, "lng": 169.355, "q": "Haast Pass Lookout", "at": ["https://www.alltrails.com/trail/new-zealand/southland/haast-pass-lookout-track"]}, {"n": "Fahrt → Makarora", "k": "drive", "m": 20, "km": 25, "i": "", "dr": true, "opt": false}]}, {"d": "So 14.02.2027", "acc": {"n": "A Remarkable View!, Queenstown (Frankton)", "lat": -45.019, "lng": 168.736, "q": "3 Quill Street Queenstown"}, "from": {"n": "Mountainview Makarora Accommodation", "lat": -44.232, "lng": 169.229}, "items": [{"n": "Fahrt Makarora → Brewster Track", "k": "drive", "m": 20, "km": 25, "i": "Früh los", "dr": true, "opt": false}, {"n": "Brewster Track zum Brewster Glacier", "k": "hike", "m": 360, "km": 9.8, "i": "Vormittag bis Mittag; sehr steil, ca. 1.000 Hm", "dr": false, "opt": false, "lat": -44.08, "lng": 169.43, "q": "Brewster Track", "at": ["https://www.alltrails.com/trail/new-zealand/otago/brewster-track-to-brewster-glacier"]}, {"n": "Fahrt → Blue Pools", "k": "drive", "m": 15, "km": 15, "i": "Nachmittag", "dr": true, "opt": false}, {"n": "Blue Pools Track", "k": "hike", "m": 70, "km": null, "i": "", "dr": false, "opt": false, "lat": -44.164, "lng": 169.277, "q": "Blue Pools Track", "at": ["https://www.alltrails.com/trail/new-zealand/west-coast/blue-pools-track"]}, {"n": "Fahrt → Wanaka", "k": "drive", "m": 60, "km": 65, "i": "", "dr": true, "opt": false}, {"n": "Wanaka: Wanaka Tree, Waterfall Creek, Millennium Walkway (Teilstück)", "k": "stop", "m": 135, "km": null, "i": "Spätnachmittag", "dr": false, "opt": false, "lat": -44.698, "lng": 169.118, "q": "That Wanaka Tree"}, {"n": "Fahrt → Queenstown/Frankton über Crown Range", "k": "drive", "m": 60, "km": 65, "i": "Abend", "dr": true, "opt": false}]}, {"d": "Mo 15.02.2027", "acc": {"n": "A Remarkable View!, Queenstown (Frankton)", "lat": -45.019, "lng": 168.736, "q": "3 Quill Street Queenstown"}, "from": {"n": "A Remarkable View!, Queenstown (Frankton)", "lat": -45.019, "lng": 168.736}, "items": [{"n": "Fahrt Frankton → Raspberry Creek", "k": "drive", "m": 120, "km": 120, "i": "Früh los; letzte 30 km Schotter mit Furten", "dr": true, "opt": false}, {"n": "Rob Roy Glacier Track", "k": "hike", "m": 290, "km": 10.9, "i": "Vormittag bis Nachmittag", "dr": false, "opt": false, "lat": -44.505, "lng": 168.735, "q": "Rob Roy Glacier Track", "at": ["https://www.alltrails.com/trail/new-zealand/otago/rob-roy-glacier-track"]}, {"n": "Glendhu Bay Lookout", "k": "stop", "m": 20, "km": null, "i": "Auf dem Rückweg", "dr": false, "opt": false, "lat": -44.669, "lng": 169.034, "q": "Glendhu Bay Lookout"}, {"n": "Fahrt → Frankton", "k": "drive", "m": 120, "km": 120, "i": "Tausch-Option für den ganzen Tag: Isthmus Peak + Cromwell", "dr": true, "opt": false}]}, {"d": "Di 16.02.2027", "acc": {"n": "A Remarkable View!, Queenstown (Frankton)", "lat": -45.019, "lng": 168.736, "q": "3 Quill Street Queenstown"}, "from": {"n": "A Remarkable View!, Queenstown (Frankton)", "lat": -45.019, "lng": 168.736}, "items": [{"n": "Fahrt Frankton → Bob's Cove", "k": "drive", "m": 25, "km": 25, "i": "Vormittag", "dr": true, "opt": false}, {"n": "Bob's Cove Track", "k": "hike", "m": 70, "km": null, "i": "", "dr": false, "opt": false, "lat": -45.067, "lng": 168.546, "q": "Bob's Cove Track", "at": ["https://www.alltrails.com/trail/new-zealand/otago/bobs-cove-track"]}, {"n": "Fahrt → Glenorchy", "k": "drive", "m": 35, "km": 39.6, "i": "", "dr": true, "opt": false}, {"n": "Glenorchy Lagoon Boardwalk", "k": "stop", "m": 45, "km": null, "i": "", "dr": false, "opt": false, "lat": -44.818, "lng": 168.399, "q": "Glenorchy Lagoon Boardwalk"}, {"n": "Fahrt → Routeburn Shelter", "k": "drive", "m": 30, "km": 25, "i": "Mittag", "dr": true, "opt": false}, {"n": "Routeburn Track bis Routeburn Falls Hut", "k": "hike", "m": 290, "km": 10.1, "i": "Nachmittag; kürzer: Flats Hut 7,4 km", "dr": false, "opt": false, "lat": -44.726, "lng": 168.276, "q": "Routeburn Shelter", "at": ["https://www.alltrails.com/trail/new-zealand/otago/routeburn-track-routeburn-shelter-to-routeburn-falls-hut"]}, {"n": "Fahrt → Frankton", "k": "drive", "m": 65, "km": 80, "i": "Abend", "dr": true, "opt": false}]}, {"d": "Mi 17.02.2027", "acc": {"n": "A Remarkable View!, Queenstown (Frankton)", "lat": -45.019, "lng": 168.736, "q": "3 Quill Street Queenstown"}, "from": {"n": "A Remarkable View!, Queenstown (Frankton)", "lat": -45.019, "lng": 168.736}, "items": [{"n": "Fahrt Frankton → Queenstown (Skyline-Gondel)", "k": "drive", "m": 15, "km": 8, "i": "Vormittag", "dr": true, "opt": false}, {"n": "Ben Lomond Track via Skyline-Gondel", "k": "hike", "m": 395, "km": 11.3, "i": "Vormittag bis Nachmittag; Gondel-Ticket", "dr": false, "opt": false, "lat": -45.031, "lng": 168.65, "q": "Skyline Queenstown", "at": ["https://www.alltrails.com/trail/new-zealand/otago/ben-lomond-track-via-skyline-gondola"]}, {"n": "Fahrt Queenstown → Arrowtown", "k": "drive", "m": 25, "km": 21, "i": "Spätnachmittag", "dr": true, "opt": false}, {"n": "Arrowtown Time Walks & Lake Hayes Walkway", "k": "stop", "m": 145, "km": null, "i": "Abend", "dr": false, "opt": false, "lat": -44.939, "lng": 168.833, "q": "Arrowtown", "at": ["https://www.alltrails.com/trail/new-zealand/otago/lake-hayes-walkway"]}, {"n": "Fahrt → Frankton", "k": "drive", "m": 20, "km": 18, "i": "", "dr": true, "opt": false}]}, {"d": "Do 18.02.2027", "acc": {"n": "Tasman Holiday Park, Te Anau", "lat": -45.418, "lng": 167.722, "q": "Tasman Holiday Parks Te Anau"}, "from": {"n": "A Remarkable View!, Queenstown (Frankton)", "lat": -45.019, "lng": 168.736}, "items": [{"n": "Fahrt Frankton → Devil's Staircase Lookout", "k": "drive", "m": 40, "km": 45, "i": "Vormittag", "dr": true, "opt": false}, {"n": "Devil's Staircase Lookout", "k": "stop", "m": 20, "km": null, "i": "", "dr": false, "opt": false, "lat": -45.246, "lng": 168.743, "q": "Devil's Staircase Lookout"}, {"n": "Fahrt → Te Anau", "k": "drive", "m": 105, "km": 155, "i": "Mittag", "dr": true, "opt": false}, {"n": "Te Anau: einchecken, tanken & einkaufen", "k": "stop", "m": 60, "km": null, "i": "Letzte Tankstelle vor der Milford Road", "dr": false, "opt": false}, {"n": "Fahrt → Mirror Lakes", "k": "drive", "m": 35, "km": 57, "i": "Nachmittag", "dr": true, "opt": false}, {"n": "Mirror Lakes", "k": "stop", "m": 30, "km": null, "i": "", "dr": false, "opt": false, "lat": -45.028, "lng": 168.011, "q": "Mirror Lakes Fiordland"}, {"n": "Fahrt → Lake Gunn", "k": "drive", "m": 20, "km": 19, "i": "", "dr": true, "opt": false}, {"n": "Lake Gunn Nature Walk", "k": "hike", "m": 55, "km": null, "i": "", "dr": false, "opt": false, "lat": -44.894, "lng": 168.075, "q": "Lake Gunn Nature Walk", "at": ["https://www.alltrails.com/trail/new-zealand/southland/lake-gunn-nature-walk"]}, {"n": "Fahrt → Te Anau", "k": "drive", "m": 70, "km": 80, "i": "Abend", "dr": true, "opt": false}]}, {"d": "Fr 19.02.2027", "acc": {"n": "Tasman Holiday Park, Te Anau", "lat": -45.418, "lng": 167.722, "q": "Tasman Holiday Parks Te Anau"}, "from": {"n": "Tasman Holiday Park, Te Anau", "lat": -45.418, "lng": 167.722}, "items": [{"n": "Fahrt Te Anau → Parkplatz Homer Tunnel", "k": "drive", "m": 90, "km": 100, "i": "Sehr früh los", "dr": true, "opt": false}, {"n": "Gertrude Saddle Route", "k": "hike", "m": 360, "km": 7, "i": "Vormittag bis Mittag; nur bei trockenem Wetter – sonst mit So tauschen", "dr": false, "opt": false, "lat": -44.77, "lng": 168.003, "q": "Gertrude Saddle Route", "at": ["https://www.alltrails.com/trail/new-zealand/southland/gertrude-saddle-route"]}, {"n": "Fahrt → Milford Sound", "k": "drive", "m": 20, "km": 19, "i": "Nachmittag", "dr": true, "opt": false}, {"n": "Milford Foreshore Walk", "k": "hike", "m": 35, "km": 1.0, "i": "", "dr": false, "opt": false, "lat": -44.672, "lng": 167.929, "q": "Milford Sound Foreshore Walk", "at": ["https://www.alltrails.com/trail/new-zealand/southland/milford-foreshore-walk"]}, {"n": "Bootsfahrt Milford Sound (optional)", "k": "boat", "m": 120, "km": null, "i": "Vorab buchen", "dr": false, "opt": true, "lat": -44.669, "lng": 167.927, "q": "Milford Sound Visitor Terminal"}, {"n": "Fahrt → The Chasm", "k": "drive", "m": 15, "km": 10, "i": "", "dr": true, "opt": false}, {"n": "The Chasm & Hundred Falls", "k": "stop", "m": 45, "km": 0.8, "i": "", "dr": false, "opt": false, "lat": -44.721, "lng": 167.951, "q": "The Chasm Fiordland", "at": ["https://www.alltrails.com/trail/new-zealand/southland/the-chasm-walk"]}, {"n": "Fahrt → Te Anau", "k": "drive", "m": 105, "km": 110, "i": "Abend", "dr": true, "opt": false}]}, {"d": "Sa 20.02.2027", "acc": {"n": "Tasman Holiday Park, Te Anau", "lat": -45.418, "lng": 167.722, "q": "Tasman Holiday Parks Te Anau"}, "from": {"n": "Tasman Holiday Park, Te Anau", "lat": -45.418, "lng": 167.722}, "items": [{"n": "Fahrt Te Anau → The Divide", "k": "drive", "m": 75, "km": 85, "i": "Früh los", "dr": true, "opt": false}, {"n": "Key Summit mit Blick auf Lake Marian + Lake Howden", "k": "hike", "m": 290, "km": 8.2, "i": "Vormittag bis Mittag", "dr": false, "opt": false, "lat": -44.825, "lng": 168.117, "q": "Key Summit Track The Divide", "at": ["https://www.alltrails.com/trail/new-zealand/otago/key-summit-and-view-of-lake-marian-via-routeburn-track", "https://www.alltrails.com/trail/new-zealand/otago/lake-howden-via-routeburn-track"]}, {"n": "Fahrt → Lake Marian Parkplatz", "k": "drive", "m": 15, "km": 10, "i": "Nachmittag", "dr": true, "opt": false}, {"n": "Lake Marian Track", "k": "hike", "m": 215, "km": 7, "i": "", "dr": false, "opt": false, "lat": -44.808, "lng": 168.102, "q": "Lake Marian Track", "at": ["https://www.alltrails.com/trail/new-zealand/otago/lake-marian-track"]}, {"n": "Fahrt → Humboldt Falls", "k": "drive", "m": 30, "km": 22, "i": "", "dr": true, "opt": false}, {"n": "Humboldt Falls", "k": "hike", "m": 35, "km": null, "i": "", "dr": false, "opt": false, "lat": -44.696, "lng": 168.129, "q": "Humboldt Falls", "at": ["https://www.alltrails.com/trail/new-zealand/otago/humbolt-falls-lookout-trail"]}, {"n": "Fahrt → Te Anau", "k": "drive", "m": 95, "km": 110, "i": "Abend", "dr": true, "opt": false}]}, {"d": "So 21.02.2027", "acc": {"n": "Beach Lodge Motel, St Kilda (Dunedin)", "lat": -45.906, "lng": 170.497, "q": "Beach Lodge Motel St Kilda Dunedin"}, "from": {"n": "Tasman Holiday Park, Te Anau", "lat": -45.418, "lng": 167.722}, "items": [{"n": "Fahrt Te Anau → Dunedin", "k": "drive", "m": 210, "km": 290, "i": "Vormittag; über Gore", "dr": true, "opt": false}, {"n": "Tunnel Beach", "k": "hike", "m": 70, "km": 1.0, "i": "Nachmittag, bei Ebbe", "dr": false, "opt": false, "lat": -45.921, "lng": 170.459, "q": "Tunnel Beach Dunedin", "at": ["https://www.alltrails.com/trail/new-zealand/otago/tunnel-beach-track"]}]}, {"d": "Mo 22.02.2027", "acc": {"n": "Beach Lodge Motel, St Kilda (Dunedin)", "lat": -45.906, "lng": 170.497, "q": "Beach Lodge Motel St Kilda Dunedin"}, "from": {"n": "Beach Lodge Motel, St Kilda (Dunedin)", "lat": -45.906, "lng": 170.497}, "items": [{"n": "Fahrt Dunedin → Taiaroa Head", "k": "drive", "m": 45, "km": 33, "i": "Vormittag", "dr": true, "opt": false}, {"n": "Royal Albatross Centre", "k": "stop", "m": 135, "km": null, "i": "Tour vorab reservieren", "dr": false, "opt": false, "lat": -45.776, "lng": 170.728, "q": "Royal Albatross Centre"}, {"n": "Fahrt → Sandfly Bay (optional)", "k": "drive", "m": 20, "km": 15, "i": "Nachmittag", "dr": true, "opt": true}, {"n": "Sandfly Bay (optional)", "k": "hike", "m": 110, "km": null, "i": "Seelöwen am Strand, Abstand halten", "dr": false, "opt": true, "lat": -45.896, "lng": 170.645, "q": "Sandfly Bay Otago Peninsula"}, {"n": "Blue Penguins Pukekura", "k": "stop", "m": 90, "km": null, "i": "Abend bei Dämmerung; vorab reservieren", "dr": false, "opt": false, "lat": -45.777, "lng": 170.728, "q": "Blue Penguins Pukekura"}, {"n": "Fahrt → Dunedin", "k": "drive", "m": 45, "km": 33, "i": "", "dr": true, "opt": false}]}, {"d": "Di 23.02.2027", "acc": {"n": "Mount Dobson Motel, Kimbell (Fairlie)", "lat": -44.062, "lng": 170.745, "q": "Mt Dobson Motel Kimbell Fairlie"}, "from": {"n": "Beach Lodge Motel, St Kilda (Dunedin)", "lat": -45.906, "lng": 170.497}, "items": [{"n": "Fahrt Dunedin → Moeraki Boulders", "k": "drive", "m": 65, "km": 83, "i": "Vormittag", "dr": true, "opt": false}, {"n": "Moeraki Boulders", "k": "stop", "m": 70, "km": null, "i": "Bei Ebbe am besten; belebter Parkplatz, Gepäck abgedeckt lassen", "dr": false, "opt": false, "lat": -45.351, "lng": 170.828, "q": "Moeraki Boulders"}, {"n": "Fahrt → Katiki Point", "k": "drive", "m": 10, "km": 7, "i": "", "dr": true, "opt": false}, {"n": "Katiki Point Lighthouse", "k": "stop", "m": 60, "km": null, "i": "Gelbaugenpinguine und Robben aus nächster Nähe; Abstand halten, am besten am späten Vormittag", "dr": false, "opt": false, "lat": -45.393, "lng": 170.865, "q": "Katiki Point Lighthouse"}, {"n": "Fahrt → Oamaru", "k": "drive", "m": 35, "km": 45, "i": "", "dr": true, "opt": false}, {"n": "Oamaru Victorian Precinct", "k": "stop", "m": 135, "km": null, "i": "Mittag; Auto in der Stadt in Sichtweite parken", "dr": false, "opt": false, "lat": -45.103, "lng": 170.971, "q": "Oamaru Victorian Precinct"}, {"n": "Fahrt Oamaru → Timaru → Kimbell", "k": "drive", "m": 110, "km": 155, "i": "Nachmittag; über Timaru und Fairlie, einchecken", "dr": true, "opt": false}, {"n": "Fahrt Kimbell → Lake Tekapo (Mount John)", "k": "drive", "m": 30, "km": 35, "i": "Abends, ohne Gepäck", "dr": true, "opt": false}, {"n": "Mount John Walkway", "k": "hike", "m": 180, "km": 8.4, "i": "Zum Sonnenuntergang; Blick über den Lake Tekapo", "dr": false, "opt": false, "lat": -43.99, "lng": 170.465, "q": "Mount John Walkway", "at": ["https://www.alltrails.com/trail/new-zealand/canterbury/mount-john-walkway"]}, {"n": "Fahrt → Kimbell", "k": "drive", "m": 30, "km": 35, "i": "Abend", "dr": true, "opt": false}]}, {"d": "Mi 24.02.2027", "acc": {"n": "Mount Dobson Motel, Kimbell (Fairlie)", "lat": -44.062, "lng": 170.745, "q": "Mt Dobson Motel Kimbell Fairlie"}, "from": {"n": "Mount Dobson Motel, Kimbell (Fairlie)", "lat": -44.062, "lng": 170.745}, "items": [{"n": "Fahrt Kimbell → Peter's Lookout (Lake Pukaki)", "k": "drive", "m": 65, "km": 80, "i": "Stefans Geburtstag – Abfahrt ca. 8:30", "dr": true, "opt": false}, {"n": "Peter's Lookout (Lake Pukaki)", "k": "stop", "m": 30, "km": null, "i": "Ca. 9:30 – Geburtstagsfoto mit Aoraki über dem See", "dr": false, "opt": false, "lat": -44.13, "lng": 170.15, "q": "Peters Lookout Lake Pukaki"}, {"n": "Fahrt → Mount Cook Village", "k": "drive", "m": 45, "km": 55, "i": "", "dr": true, "opt": false}, {"n": "Hooker Valley Track", "k": "hike", "m": 215, "km": 10, "i": "Ca. 10:30–14:00; flach, drei Hängebrücken, Gletschersee mit Eisbergen", "dr": false, "opt": false, "lat": -43.718, "lng": 170.094, "q": "Hooker Valley Track", "at": ["https://www.alltrails.com/trail/new-zealand/canterbury/hooker-lake-via-hooker-valley-track"]}, {"n": "Fahrt → Parkplatz Tasman Valley Road", "k": "drive", "m": 10, "km": 8, "i": "", "dr": true, "opt": false}, {"n": "Tasman Glacier View & Blue Lakes", "k": "hike", "m": 60, "km": null, "i": "Ca. 14:15–15:15; kurz, Blick auf den Tasman-Gletschersee", "dr": false, "opt": false, "lat": -43.693, "lng": 170.162, "q": "Tasman Glacier View Track", "at": ["https://www.alltrails.com/trail/new-zealand/canterbury/tasman-lake-track", "https://www.alltrails.com/trail/new-zealand/canterbury/blue-lakes-loop-track"]}, {"n": "Fahrt → Mount Cook Village", "k": "drive", "m": 10, "km": 8, "i": "", "dr": true, "opt": false}, {"n": "Kaffee & Geburtstagskuchen (z. B. The Hermitage)", "k": "stop", "m": 60, "km": null, "i": "Ca. 15:30 – mit Blick auf Aoraki", "dr": false, "opt": false, "lat": -43.735, "lng": 170.096, "q": "The Hermitage Hotel Mount Cook"}, {"n": "Fahrt → Lake Tekapo", "k": "drive", "m": 75, "km": 105, "i": "Ca. 16:30", "dr": true, "opt": false}, {"n": "Geburtstags-Abendessen in Tekapo", "k": "stop", "m": 90, "km": null, "i": "Ab ca. 18:00 – unbedingt reservieren", "dr": false, "opt": false, "lat": -44.004, "lng": 170.477, "q": "Restaurants Lake Tekapo"}, {"n": "Fahrt → Kimbell", "k": "drive", "m": 30, "km": 35, "i": "Gegen 20 Uhr zurück", "dr": true, "opt": false}]}, {"d": "Do 25.02.2027", "acc": {"n": "Mount Dobson Motel, Kimbell (Fairlie)", "lat": -44.062, "lng": 170.745, "q": "Mt Dobson Motel Kimbell Fairlie"}, "from": {"n": "Mount Dobson Motel, Kimbell (Fairlie)", "lat": -44.062, "lng": 170.745}, "items": [{"n": "Fahrt Kimbell → Mount Cook Village", "k": "drive", "m": 105, "km": 140, "i": "Früh los", "dr": true, "opt": false}, {"n": "Sealy Tarns Track", "k": "hike", "m": 215, "km": 5.3, "i": "Vormittag; ca. 2.200 Stufen – bei schlechtem Wetter mit dem 24.02. tauschen", "dr": false, "opt": false, "lat": -43.716, "lng": 170.09, "q": "Sealy Tarns Track", "at": ["https://www.alltrails.com/trail/new-zealand/canterbury/sealy-tarns-track"]}, {"n": "Fahrt → Lake Tekapo", "k": "drive", "m": 75, "km": 105, "i": "Nachmittag", "dr": true, "opt": false}, {"n": "Church of the Good Shepherd & Seeufer", "k": "stop", "m": 70, "km": null, "i": "Spätnachmittag", "dr": false, "opt": false, "lat": -44.006, "lng": 170.483, "q": "Church of the Good Shepherd Tekapo"}, {"n": "Tekapo Springs (optional)", "k": "stop", "m": 180, "km": null, "i": "Hot Pools zum Ausklang", "dr": false, "opt": true, "lat": -43.998, "lng": 170.468, "q": "Tekapo Springs"}, {"n": "Sternbeobachtung Dark Sky Reserve (optional)", "k": "stop", "m": 135, "km": null, "i": "Abends nach Einbruch der Dunkelheit; Tour vorab buchen", "dr": false, "opt": true, "lat": -43.987, "lng": 170.465, "q": "Dark Sky Project Tekapo"}, {"n": "Fahrt → Kimbell", "k": "drive", "m": 30, "km": 35, "i": "Abend", "dr": true, "opt": false}]}, {"d": "Fr 26.02.2027", "acc": {"n": "Christchurch – Mietwagen-Rückgabe", "lat": -43.533, "lng": 172.633, "q": "Christchurch", "end": true}, "from": {"n": "Mount Dobson Motel, Kimbell (Fairlie)", "lat": -44.062, "lng": 170.745}, "items": [{"n": "Fahrt Kimbell → Christchurch", "k": "drive", "m": 140, "km": 185, "i": "Vormittag; Mietwagen zurückgeben", "dr": true, "opt": false}]}];
+const SI={"type": "MultiPolygon", "coordinates": [[[[167.418, -47.232], [167.432, -47.219], [167.454, -47.207], [167.479, -47.205], [167.486, -47.219], [167.475, -47.227], [167.45, -47.239], [167.425, -47.244], [167.418, -47.232]]], [[[167.709, -46.785], [167.699, -46.792], [167.684, -46.795], [167.67, -46.792], [167.663, -46.778], [167.666, -46.765], [167.677, -46.758], [167.695, -46.758], [167.706, -46.76], [167.72, -46.768], [167.709, -46.785]]], [[[168.591, -46.733], [168.606, -46.754], [168.595, -46.775], [168.573, -46.792], [168.563, -46.802], [168.566, -46.79], [168.563, -46.781], [168.552, -46.773], [168.541, -46.76], [168.559, -46.758], [168.573, -46.754], [168.584, -46.746], [168.591, -46.733]]], [[[168.199, -47.048], [168.246, -47.069], [168.257, -47.079], [168.26, -47.085], [168.253, -47.089], [168.242, -47.089], [168.235, -47.089], [168.228, -47.085], [168.221, -47.072], [168.213, -47.069], [168.192, -47.067], [168.185, -47.074], [168.192, -47.099], [168.181, -47.104], [168.145, -47.094], [168.159, -47.109], [168.084, -47.109], [168.023, -47.116], [167.997, -47.124], [167.933, -47.165], [167.915, -47.182], [167.9, -47.188], [167.886, -47.188], [167.868, -47.183], [167.853, -47.175], [167.839, -47.168], [167.803, -47.173], [167.789, -47.172], [167.778, -47.16], [167.774, -47.145], [167.763, -47.138], [167.745, -47.151], [167.727, -47.153], [167.72, -47.156], [167.72, -47.161], [167.713, -47.185], [167.699, -47.177], [167.645, -47.205], [167.616, -47.212], [167.634, -47.226], [167.666, -47.222], [167.727, -47.205], [167.713, -47.224], [167.702, -47.237], [167.673, -47.261], [167.673, -47.236], [167.659, -47.236], [167.641, -47.249], [167.627, -47.264], [167.609, -47.271], [167.576, -47.276], [167.54, -47.278], [167.522, -47.273], [167.515, -47.254], [167.522, -47.229], [167.533, -47.204], [167.544, -47.188], [167.555, -47.182], [167.576, -47.18], [167.594, -47.168], [167.63, -47.156], [167.612, -47.148], [167.612, -47.139], [167.619, -47.129], [167.623, -47.116], [167.623, -47.101], [167.619, -47.09], [167.619, -47.079], [167.627, -47.065], [167.637, -47.055], [167.648, -47.048], [167.673, -47.036], [167.688, -47.033], [167.702, -47.035], [167.713, -47.04], [167.727, -47.042], [167.745, -47.028], [167.738, -47.003], [167.731, -46.977], [167.738, -46.955], [167.749, -46.95], [167.778, -46.95], [167.792, -46.942], [167.81, -46.922], [167.814, -46.911], [167.817, -46.898], [167.81, -46.874], [167.799, -46.854], [167.763, -46.819], [167.76, -46.807], [167.763, -46.798], [167.771, -46.792], [167.774, -46.783], [167.774, -46.778], [167.771, -46.773], [167.771, -46.768], [167.763, -46.763], [167.76, -46.756], [167.763, -46.751], [167.767, -46.746], [167.767, -46.739], [167.774, -46.712], [167.789, -46.697], [167.81, -46.692], [167.839, -46.692], [167.868, -46.699], [167.882, -46.7], [167.897, -46.695], [167.907, -46.685], [167.922, -46.684], [167.969, -46.7], [167.987, -46.711], [168.005, -46.724], [168.095, -46.812], [168.109, -46.822], [168.123, -46.829], [168.138, -46.839], [168.145, -46.852], [168.156, -46.856], [168.177, -46.864], [168.192, -46.878], [168.17, -46.89], [168.192, -46.898], [168.192, -46.903], [168.167, -46.91], [168.077, -46.903], [168.084, -46.89], [168.026, -46.888], [168.008, -46.895], [168.019, -46.915], [168.015, -46.925], [167.965, -46.972], [167.99, -46.971], [168.026, -46.94], [168.048, -46.932], [168.059, -46.935], [168.087, -46.949], [168.113, -46.954], [168.152, -46.966], [168.149, -46.972], [168.145, -46.977], [168.138, -46.982], [168.131, -46.986], [168.131, -46.993], [168.141, -46.993], [168.195, -46.979], [168.21, -46.979], [168.224, -46.974], [168.231, -46.972], [168.235, -46.976], [168.235, -46.984], [168.246, -46.991], [168.253, -46.996], [168.26, -46.999], [168.257, -47.009], [168.249, -47.035], [168.246, -47.042], [168.235, -47.045], [168.224, -47.045], [168.213, -47.042], [168.199, -47.042], [168.199, -47.048]]], [[[166.712, -45.616], [166.73, -45.626], [166.745, -45.645], [166.752, -45.669], [166.755, -45.691], [166.752, -45.713], [166.741, -45.728], [166.723, -45.736], [166.698, -45.74], [166.698, -45.735], [166.691, -45.724], [166.683, -45.719], [166.676, -45.736], [166.665, -45.741], [166.658, -45.741], [166.651, -45.74], [166.644, -45.729], [166.64, -45.709], [166.637, -45.689], [166.637, -45.677], [166.622, -45.659], [166.604, -45.66], [166.543, -45.711], [166.529, -45.719], [166.507, -45.724], [166.511, -45.711], [166.521, -45.694], [166.532, -45.677], [166.543, -45.67], [166.547, -45.667], [166.557, -45.652], [166.568, -45.637], [166.579, -45.635], [166.604, -45.635], [166.683, -45.616], [166.701, -45.615], [166.712, -45.616]]], [[[166.975, -45.164], [166.982, -45.199], [166.997, -45.233], [167.033, -45.301], [167, -45.306], [166.986, -45.302], [166.971, -45.289], [166.953, -45.282], [166.932, -45.277], [166.914, -45.27], [166.903, -45.257], [166.892, -45.243], [166.892, -45.236], [166.899, -45.231], [166.899, -45.228], [166.907, -45.218], [166.968, -45.15], [166.968, -45.154], [166.968, -45.157], [166.971, -45.16], [166.975, -45.164]]], [[[174.38, -41.106], [174.398, -41.108], [174.398, -41.116], [174.398, -41.126], [174.402, -41.14], [174.395, -41.153], [174.388, -41.184], [174.38, -41.196], [174.366, -41.202], [174.348, -41.204], [174.33, -41.202], [174.312, -41.202], [174.298, -41.207], [174.272, -41.224], [174.265, -41.229], [174.247, -41.233], [174.197, -41.229], [174.204, -41.226], [174.215, -41.218], [174.215, -41.216], [174.226, -41.216], [174.251, -41.218], [174.262, -41.213], [174.312, -41.169], [174.33, -41.182], [174.352, -41.175], [174.366, -41.159], [174.366, -41.14], [174.355, -41.147], [174.341, -41.145], [174.334, -41.138], [174.326, -41.126], [174.344, -41.126], [174.355, -41.118], [174.37, -41.111], [174.38, -41.106]]], [[[173.783, -40.907], [173.797, -40.902], [173.801, -40.895], [173.804, -40.885], [173.797, -40.873], [173.786, -40.883], [173.783, -40.887], [173.779, -40.875], [173.776, -40.863], [173.779, -40.85], [173.783, -40.839], [173.801, -40.85], [173.812, -40.861], [173.826, -40.871], [173.848, -40.873], [173.848, -40.866], [173.833, -40.86], [173.822, -40.848], [173.815, -40.836], [173.812, -40.819], [173.815, -40.804], [173.826, -40.767], [173.833, -40.758], [173.837, -40.758], [173.84, -40.767], [173.84, -40.775], [173.851, -40.777], [173.855, -40.763], [173.862, -40.755], [173.869, -40.75], [173.884, -40.757], [173.884, -40.77], [173.884, -40.789], [173.887, -40.806], [173.894, -40.795], [173.927, -40.789], [173.941, -40.777], [173.909, -40.777], [173.93, -40.763], [173.941, -40.755], [173.948, -40.743], [173.959, -40.714], [173.966, -40.709], [173.97, -40.723], [173.97, -40.738], [173.966, -40.752], [173.956, -40.777], [173.963, -40.787], [173.963, -40.794], [173.959, -40.797], [173.952, -40.801], [173.938, -40.814], [173.934, -40.819], [173.93, -40.829], [173.927, -40.855], [173.923, -40.866], [173.916, -40.868], [173.898, -40.866], [173.891, -40.87], [173.88, -40.882], [173.873, -40.887], [173.848, -40.893], [173.844, -40.897], [173.837, -40.904], [173.837, -40.91], [173.833, -40.915], [173.819, -40.922], [173.804, -40.927], [173.79, -40.927], [173.779, -40.922], [173.783, -40.919], [173.783, -40.915], [173.783, -40.912], [173.783, -40.907]]], [[[172.75, -43.279], [172.757, -43.293], [172.75, -43.317], [172.746, -43.342], [172.742, -43.394], [172.735, -43.401], [172.728, -43.414], [172.732, -43.436], [172.75, -43.499], [172.778, -43.558], [172.778, -43.573], [172.764, -43.563], [172.753, -43.561], [172.75, -43.566], [172.757, -43.582], [172.771, -43.59], [172.832, -43.602], [172.804, -43.61], [172.739, -43.614], [172.71, -43.622], [172.681, -43.639], [172.692, -43.647], [172.721, -43.651], [172.742, -43.656], [172.764, -43.636], [172.8, -43.629], [172.836, -43.629], [172.854, -43.632], [172.858, -43.646], [172.865, -43.661], [172.876, -43.669], [172.879, -43.666], [172.886, -43.639], [172.894, -43.614], [172.919, -43.627], [172.926, -43.636], [172.93, -43.653], [172.926, -43.68], [172.93, -43.686], [172.944, -43.683], [172.951, -43.674], [172.958, -43.663], [172.966, -43.653], [172.98, -43.647], [172.994, -43.649], [173.009, -43.654], [173.02, -43.663], [173.023, -43.676], [173.052, -43.653], [173.066, -43.647], [173.07, -43.666], [173.081, -43.676], [173.095, -43.685], [173.106, -43.696], [173.106, -43.703], [173.106, -43.712], [173.102, -43.718], [173.099, -43.723], [173.102, -43.73], [173.11, -43.74], [173.113, -43.745], [173.117, -43.772], [173.113, -43.801], [173.106, -43.83], [173.092, -43.853], [173.081, -43.84], [173.056, -43.864], [173.038, -43.86], [173.03, -43.882], [173.03, -43.889], [173.023, -43.881], [173.012, -43.879], [173.005, -43.882], [172.998, -43.889], [172.991, -43.875], [172.98, -43.853], [172.976, -43.84], [172.976, -43.825], [172.98, -43.816], [172.976, -43.81], [172.966, -43.796], [172.962, -43.783], [172.962, -43.769], [172.962, -43.756], [172.948, -43.75], [172.933, -43.756], [172.926, -43.766], [172.93, -43.777], [172.944, -43.786], [172.93, -43.813], [172.926, -43.84], [172.937, -43.867], [172.969, -43.902], [172.966, -43.906], [172.944, -43.902], [172.876, -43.902], [172.865, -43.896], [172.84, -43.875], [172.818, -43.882], [172.804, -43.875], [172.786, -43.853], [172.746, -43.825], [172.746, -43.811], [172.764, -43.793], [172.746, -43.794], [172.717, -43.803], [172.638, -43.811], [172.609, -43.823], [172.552, -43.826], [172.462, -43.85], [172.422, -43.855], [172.415, -43.85], [172.418, -43.84], [172.429, -43.833], [172.44, -43.828], [172.469, -43.825], [172.616, -43.788], [172.634, -43.786], [172.649, -43.783], [172.642, -43.776], [172.613, -43.762], [172.598, -43.759], [172.57, -43.762], [172.552, -43.757], [172.544, -43.752], [172.534, -43.739], [172.523, -43.732], [172.498, -43.722], [172.472, -43.725], [172.447, -43.734], [172.418, -43.737], [172.4, -43.749], [172.39, -43.772], [172.386, -43.803], [172.386, -43.826], [172.39, -43.842], [172.39, -43.847], [172.39, -43.852], [172.375, -43.864], [172.364, -43.869], [172.282, -43.879], [172.271, -43.877], [172.249, -43.881], [172.231, -43.896], [172.184, -43.908], [172.166, -43.921], [172.062, -43.956], [171.868, -44.058], [171.839, -44.063], [171.821, -44.059], [171.806, -44.061], [171.796, -44.066], [171.72, -44.105], [171.684, -44.11], [171.666, -44.115], [171.655, -44.124], [171.644, -44.132], [171.634, -44.141], [171.605, -44.146], [171.58, -44.161], [171.569, -44.162], [171.551, -44.168], [171.533, -44.183], [171.522, -44.191], [171.515, -44.2], [171.49, -44.206], [171.479, -44.213], [171.418, -44.26], [171.392, -44.271], [171.371, -44.265], [171.356, -44.272], [171.346, -44.279], [171.338, -44.289], [171.335, -44.299], [171.281, -44.372], [171.277, -44.384], [171.277, -44.439], [171.27, -44.458], [171.259, -44.473], [171.227, -44.499], [171.227, -44.507], [171.227, -44.519], [171.223, -44.529], [171.212, -44.532], [171.202, -44.534], [171.173, -44.547], [171.194, -44.566], [171.202, -44.602], [171.202, -44.676], [171.212, -44.725], [171.216, -44.742], [171.209, -44.76], [171.198, -44.769], [171.184, -44.774], [171.173, -44.786], [171.202, -44.789], [171.212, -44.814], [171.212, -44.846], [171.202, -44.905], [171.194, -44.926], [171.18, -44.941], [171.173, -44.953], [171.162, -44.968], [171.158, -44.983], [171.09, -45.074], [170.982, -45.155], [170.928, -45.238], [170.903, -45.309], [170.888, -45.331], [170.878, -45.356], [170.892, -45.368], [170.91, -45.38], [170.906, -45.404], [170.87, -45.434], [170.86, -45.448], [170.86, -45.458], [170.863, -45.469], [170.867, -45.481], [170.852, -45.5], [170.824, -45.513], [170.802, -45.529], [170.809, -45.554], [170.798, -45.566], [170.788, -45.571], [170.773, -45.571], [170.755, -45.561], [170.759, -45.572], [170.762, -45.583], [170.77, -45.601], [170.752, -45.613], [170.741, -45.616], [170.705, -45.616], [170.683, -45.621], [170.683, -45.632], [170.698, -45.64], [170.723, -45.643], [170.698, -45.679], [170.69, -45.684], [170.68, -45.687], [170.665, -45.692], [170.647, -45.706], [170.636, -45.708], [170.633, -45.706], [170.626, -45.706], [170.626, -45.714], [170.626, -45.724], [170.626, -45.729], [170.629, -45.733], [170.64, -45.733], [170.654, -45.736], [170.669, -45.743], [170.68, -45.743], [170.694, -45.733], [170.712, -45.743], [170.737, -45.753], [170.759, -45.763], [170.759, -45.777], [170.741, -45.787], [170.694, -45.794], [170.672, -45.8], [170.654, -45.822], [170.647, -45.829], [170.636, -45.831], [170.626, -45.832], [170.615, -45.836], [170.604, -45.861], [170.568, -45.88], [170.557, -45.897], [170.575, -45.89], [170.611, -45.883], [170.644, -45.865], [170.687, -45.851], [170.701, -45.843], [170.716, -45.819], [170.73, -45.807], [170.741, -45.8], [170.755, -45.799], [170.766, -45.794], [170.777, -45.78], [170.788, -45.794], [170.791, -45.809], [170.788, -45.863], [170.78, -45.876], [170.762, -45.881], [170.741, -45.883], [170.723, -45.881], [170.719, -45.883], [170.708, -45.888], [170.701, -45.895], [170.701, -45.902], [170.701, -45.908], [170.492, -45.924], [170.41, -45.944], [170.334, -45.981], [170.276, -46.04], [170.258, -46.064], [170.255, -46.076], [170.255, -46.104], [170.244, -46.123], [170.244, -46.133], [170.233, -46.153], [170.219, -46.174], [170.194, -46.189], [170.172, -46.197], [170.122, -46.212], [170.096, -46.224], [170.075, -46.243], [170.057, -46.261], [170.039, -46.277], [169.898, -46.344], [169.866, -46.378], [169.851, -46.43], [169.855, -46.457], [169.848, -46.467], [169.819, -46.474], [169.797, -46.489], [169.79, -46.493], [169.772, -46.489], [169.74, -46.481], [169.722, -46.479], [169.704, -46.481], [169.675, -46.489], [169.661, -46.493], [169.675, -46.496], [169.754, -46.499], [169.736, -46.535], [169.704, -46.548], [169.668, -46.559], [169.635, -46.579], [169.621, -46.577], [169.596, -46.57], [169.567, -46.565], [169.545, -46.572], [169.535, -46.581], [169.481, -46.602], [169.488, -46.606], [169.495, -46.618], [169.502, -46.623], [169.473, -46.63], [169.441, -46.623], [169.409, -46.621], [169.391, -46.643], [169.369, -46.633], [169.365, -46.63], [169.329, -46.626], [169.311, -46.626], [169.301, -46.633], [169.279, -46.648], [169.268, -46.655], [169.254, -46.657], [169.221, -46.66], [169.207, -46.66], [169.193, -46.65], [169.196, -46.63], [169.196, -46.618], [169.193, -46.618], [169.182, -46.616], [169.171, -46.623], [169.171, -46.645], [169.16, -46.651], [169.157, -46.657], [169.157, -46.662], [169.149, -46.665], [169.117, -46.665], [169.099, -46.66], [169.092, -46.651], [169.085, -46.641], [169.077, -46.636], [169.063, -46.638], [169.063, -46.646], [169.067, -46.658], [169.063, -46.672], [169.034, -46.682], [169.002, -46.675], [168.969, -46.663], [168.941, -46.657], [168.908, -46.658], [168.89, -46.657], [168.876, -46.645], [168.851, -46.582], [168.851, -46.572], [168.843, -46.56], [168.833, -46.56], [168.8, -46.567], [168.699, -46.582], [168.663, -46.582], [168.674, -46.57], [168.685, -46.567], [168.699, -46.565], [168.714, -46.562], [168.692, -46.552], [168.667, -46.548], [168.617, -46.547], [168.627, -46.562], [168.638, -46.57], [168.645, -46.577], [168.631, -46.589], [168.635, -46.591], [168.642, -46.599], [168.645, -46.602], [168.591, -46.614], [168.419, -46.602], [168.433, -46.584], [168.437, -46.581], [168.447, -46.575], [168.462, -46.572], [168.494, -46.572], [168.509, -46.575], [168.519, -46.587], [168.548, -46.591], [168.566, -46.586], [168.541, -46.567], [168.512, -46.56], [168.426, -46.562], [168.386, -46.543], [168.365, -46.54], [168.357, -46.557], [168.365, -46.579], [168.393, -46.606], [168.404, -46.623], [168.379, -46.619], [168.343, -46.589], [168.318, -46.582], [168.314, -46.577], [168.314, -46.567], [168.307, -46.559], [168.282, -46.552], [168.275, -46.547], [168.271, -46.538], [168.267, -46.527], [168.3, -46.52], [168.311, -46.52], [168.321, -46.523], [168.321, -46.525], [168.321, -46.53], [168.325, -46.537], [168.332, -46.53], [168.386, -46.499], [168.393, -46.472], [168.386, -46.44], [168.368, -46.417], [168.343, -46.417], [168.35, -46.442], [168.343, -46.466], [168.321, -46.481], [168.303, -46.479], [168.289, -46.464], [168.271, -46.423], [168.217, -46.354], [168.199, -46.342], [168.17, -46.337], [168.073, -46.349], [168.059, -46.354], [168.059, -46.366], [168.062, -46.378], [168.059, -46.383], [168.044, -46.38], [168.026, -46.375], [168.008, -46.369], [167.997, -46.373], [167.969, -46.369], [167.947, -46.369], [167.94, -46.38], [167.933, -46.39], [167.922, -46.393], [167.911, -46.391], [167.9, -46.39], [167.886, -46.385], [167.879, -46.383], [167.871, -46.385], [167.857, -46.395], [167.85, -46.396], [167.839, -46.393], [167.828, -46.386], [167.821, -46.376], [167.807, -46.373], [167.799, -46.364], [167.785, -46.346], [167.774, -46.339], [167.753, -46.329], [167.742, -46.322], [167.753, -46.315], [167.767, -46.312], [167.781, -46.307], [167.789, -46.293], [167.738, -46.246], [167.713, -46.217], [167.713, -46.197], [167.699, -46.189], [167.655, -46.185], [167.637, -46.182], [167.591, -46.16], [167.576, -46.157], [167.461, -46.148], [167.454, -46.15], [167.447, -46.157], [167.447, -46.174], [167.443, -46.182], [167.432, -46.197], [167.425, -46.211], [167.425, -46.224], [167.418, -46.239], [167.407, -46.251], [167.389, -46.255], [167.357, -46.253], [167.339, -46.256], [167.31, -46.27], [167.295, -46.273], [167.274, -46.272], [167.234, -46.261], [167.213, -46.26], [167.195, -46.263], [167.187, -46.266], [167.18, -46.27], [167.173, -46.273], [167.169, -46.27], [167.166, -46.263], [167.162, -46.26], [167.148, -46.258], [167.087, -46.238], [167.069, -46.238], [167.051, -46.239], [167.033, -46.239], [166.968, -46.226], [166.827, -46.228], [166.763, -46.219], [166.705, -46.19], [166.676, -46.163], [166.673, -46.153], [166.676, -46.147], [166.705, -46.138], [166.716, -46.133], [166.755, -46.103], [166.788, -46.069], [166.817, -46.022], [166.831, -46.001], [166.853, -45.993], [166.881, -45.988], [166.928, -45.961], [166.953, -45.951], [166.953, -45.944], [166.932, -45.946], [166.871, -45.973], [166.827, -45.983], [166.802, -45.993], [166.788, -46.005], [166.784, -46.017], [166.788, -46.023], [166.791, -46.03], [166.788, -46.04], [166.784, -46.042], [166.752, -46.066], [166.752, -46.071], [166.748, -46.071], [166.741, -46.06], [166.741, -46.057], [166.745, -46.049], [166.745, -46.04], [166.734, -46.033], [166.719, -46.064], [166.687, -46.077], [166.615, -46.087], [166.615, -46.071], [166.619, -46.055], [166.629, -46.047], [166.644, -46.054], [166.647, -46.022], [166.658, -46], [166.676, -45.984], [166.705, -45.973], [166.766, -45.963], [166.791, -45.952], [166.809, -45.93], [166.773, -45.942], [166.741, -45.951], [166.727, -45.949], [166.705, -45.946], [166.691, -45.941], [166.687, -45.934], [166.745, -45.887], [166.752, -45.876], [166.755, -45.87], [166.745, -45.861], [166.734, -45.863], [166.723, -45.87], [166.712, -45.876], [166.709, -45.88], [166.705, -45.887], [166.701, -45.895], [166.698, -45.9], [166.68, -45.908], [166.676, -45.914], [166.647, -45.944], [166.644, -45.954], [166.629, -45.966], [166.536, -45.984], [166.521, -45.991], [166.496, -46.01], [166.489, -46.013], [166.482, -46.008], [166.475, -45.996], [166.471, -45.983], [166.471, -45.976], [166.475, -45.964], [166.471, -45.951], [166.467, -45.93], [166.467, -45.841], [166.475, -45.817], [166.489, -45.807], [166.554, -45.8], [166.622, -45.8], [166.615, -45.807], [166.622, -45.816], [166.647, -45.8], [166.676, -45.794], [166.741, -45.794], [166.766, -45.79], [166.82, -45.777], [166.845, -45.773], [166.874, -45.777], [166.889, -45.777], [166.899, -45.77], [166.91, -45.762], [166.917, -45.757], [166.939, -45.745], [166.986, -45.729], [167.007, -45.719], [167.022, -45.697], [166.979, -45.709], [166.964, -45.711], [166.892, -45.706], [166.799, -45.724], [166.773, -45.719], [166.791, -45.689], [166.806, -45.679], [166.824, -45.67], [166.874, -45.659], [166.892, -45.65], [166.795, -45.66], [166.777, -45.657], [166.77, -45.633], [166.77, -45.611], [166.781, -45.594], [166.806, -45.588], [166.831, -45.583], [166.881, -45.564], [166.91, -45.561], [166.964, -45.574], [166.993, -45.576], [167.015, -45.561], [166.979, -45.562], [166.964, -45.557], [166.953, -45.547], [167.018, -45.532], [167.047, -45.517], [167.054, -45.491], [166.921, -45.542], [166.838, -45.552], [166.784, -45.574], [166.773, -45.576], [166.752, -45.579], [166.741, -45.581], [166.723, -45.579], [166.716, -45.576], [166.701, -45.557], [166.701, -45.542], [166.741, -45.485], [166.759, -45.426], [166.766, -45.41], [166.813, -45.393], [166.86, -45.407], [166.91, -45.431], [166.953, -45.437], [166.943, -45.414], [166.925, -45.388], [166.91, -45.38], [166.899, -45.404], [166.878, -45.392], [166.838, -45.378], [166.824, -45.368], [166.809, -45.358], [166.806, -45.346], [166.813, -45.334], [166.824, -45.317], [166.86, -45.292], [166.881, -45.28], [166.892, -45.284], [166.899, -45.301], [166.917, -45.312], [166.961, -45.328], [166.95, -45.333], [166.943, -45.338], [166.935, -45.346], [166.932, -45.355], [166.964, -45.353], [166.993, -45.343], [167.018, -45.341], [167.047, -45.361], [167.054, -45.372], [167.058, -45.38], [167.058, -45.39], [167.047, -45.404], [167.022, -45.417], [167.011, -45.427], [167.022, -45.431], [167.054, -45.429], [167.065, -45.424], [167.079, -45.414], [167.087, -45.4], [167.09, -45.387], [167.097, -45.382], [167.123, -45.4], [167.137, -45.405], [167.148, -45.414], [167.155, -45.437], [167.173, -45.471], [167.177, -45.468], [167.18, -45.464], [167.187, -45.469], [167.198, -45.475], [167.205, -45.478], [167.202, -45.446], [167.148, -45.399], [167.047, -45.328], [167.061, -45.312], [167.079, -45.306], [167.18, -45.285], [167.198, -45.285], [167.209, -45.294], [167.227, -45.317], [167.241, -45.328], [167.259, -45.331], [167.281, -45.333], [167.299, -45.326], [167.31, -45.314], [167.292, -45.309], [167.256, -45.311], [167.245, -45.304], [167.234, -45.294], [167.231, -45.289], [167.234, -45.27], [167.238, -45.258], [167.249, -45.255], [167.249, -45.253], [167.209, -45.253], [167.173, -45.267], [167.148, -45.27], [167.065, -45.277], [167.047, -45.27], [167.047, -45.257], [167.036, -45.236], [167.029, -45.216], [167.011, -45.206], [167.007, -45.194], [167.004, -45.15], [167.011, -45.133], [167.033, -45.122], [167.065, -45.123], [167.087, -45.135], [167.126, -45.174], [167.137, -45.181], [167.155, -45.184], [167.169, -45.184], [167.18, -45.177], [167.173, -45.171], [167.137, -45.15], [167.101, -45.117], [167.079, -45.103], [167.054, -45.101], [167.094, -45.056], [167.119, -45.039], [167.141, -45.044], [167.18, -45.088], [167.18, -45.103], [167.18, -45.117], [167.18, -45.127], [167.191, -45.135], [167.198, -45.122], [167.195, -45.101], [167.198, -45.095], [167.213, -45.09], [167.274, -45.095], [167.259, -45.081], [167.202, -45.068], [167.18, -45.057], [167.166, -45.041], [167.151, -45.024], [167.151, -45.007], [167.166, -44.992], [167.187, -44.985], [167.216, -44.992], [167.241, -45], [167.267, -45.005], [167.288, -45.014], [167.313, -45.029], [167.335, -45.037], [167.349, -45.025], [167.331, -45.022], [167.209, -44.973], [167.198, -44.965], [167.202, -44.949], [167.22, -44.936], [167.27, -44.905], [167.288, -44.899], [167.306, -44.897], [167.328, -44.895], [167.324, -44.892], [167.313, -44.88], [167.31, -44.875], [167.385, -44.843], [167.418, -44.841], [167.432, -44.872], [167.436, -44.877], [167.443, -44.882], [167.45, -44.889], [167.454, -44.899], [167.45, -44.909], [167.439, -44.927], [167.439, -44.938], [167.447, -44.951], [167.457, -44.961], [167.468, -44.973], [167.461, -44.992], [167.497, -44.995], [167.515, -44.993], [167.511, -44.981], [167.508, -44.976], [167.504, -44.97], [167.501, -44.961], [167.501, -44.954], [167.497, -44.948], [167.475, -44.934], [167.475, -44.924], [167.475, -44.909], [167.475, -44.894], [167.468, -44.878], [167.461, -44.868], [167.447, -44.836], [167.447, -44.824], [167.457, -44.789], [167.486, -44.767], [167.522, -44.764], [167.555, -44.786], [167.562, -44.799], [167.558, -44.806], [167.551, -44.813], [167.544, -44.828], [167.537, -44.846], [167.54, -44.86], [167.551, -44.872], [167.569, -44.882], [167.569, -44.86], [167.58, -44.845], [167.591, -44.831], [167.598, -44.814], [167.594, -44.794], [167.569, -44.772], [167.562, -44.755], [167.551, -44.742], [167.547, -44.735], [167.569, -44.728], [167.58, -44.72], [167.587, -44.716], [167.601, -44.721], [167.619, -44.74], [167.634, -44.752], [167.652, -44.76], [167.681, -44.765], [167.663, -44.759], [167.623, -44.725], [167.598, -44.708], [167.594, -44.698], [167.601, -44.683], [167.619, -44.674], [167.673, -44.662], [167.681, -44.657], [167.688, -44.642], [167.691, -44.637], [167.699, -44.634], [167.717, -44.63], [167.724, -44.625], [167.753, -44.603], [167.781, -44.595], [167.81, -44.6], [167.853, -44.629], [167.889, -44.642], [167.9, -44.652], [167.933, -44.698], [167.94, -44.686], [167.943, -44.671], [167.94, -44.656], [167.933, -44.642], [167.925, -44.639], [167.904, -44.629], [167.879, -44.608], [167.871, -44.605], [167.868, -44.603], [167.861, -44.602], [167.857, -44.595], [167.853, -44.588], [167.857, -44.561], [167.85, -44.532], [167.843, -44.517], [167.835, -44.505], [167.861, -44.48], [167.943, -44.412], [167.972, -44.394], [168.008, -44.377], [168.033, -44.353], [168.03, -44.321], [168.12, -44.321], [168.127, -44.316], [168.138, -44.299], [168.141, -44.284], [168.138, -44.281], [168.127, -44.272], [168.102, -44.265], [168.102, -44.259], [168.149, -44.247], [168.17, -44.238], [168.206, -44.208], [168.267, -44.178], [168.307, -44.149], [168.339, -44.119], [168.343, -44.112], [168.343, -44.102], [168.347, -44.09], [168.354, -44.078], [168.365, -44.07], [168.375, -44.063], [168.386, -44.058], [168.397, -44.053], [168.39, -44.051], [168.372, -44.039], [168.39, -44.032], [168.411, -44.027], [168.473, -44.026], [168.509, -44.019], [168.545, -44.005], [168.563, -43.995], [168.573, -43.989], [168.588, -43.982], [168.613, -43.985], [168.62, -43.982], [168.645, -43.965], [168.663, -43.972], [168.678, -43.989], [168.699, -44.005], [168.746, -44.011], [168.804, -43.997], [168.858, -43.973], [168.919, -43.929], [168.966, -43.906], [168.984, -43.892], [169.002, -43.882], [169.067, -43.857], [169.081, -43.847], [169.085, -43.838], [169.088, -43.828], [169.092, -43.82], [169.099, -43.815], [169.124, -43.803], [169.135, -43.799], [169.153, -43.793], [169.193, -43.759], [169.211, -43.75], [169.229, -43.745], [169.304, -43.71], [169.351, -43.698], [169.38, -43.688], [169.391, -43.673], [169.398, -43.664], [169.409, -43.658], [169.419, -43.651], [169.43, -43.647], [169.455, -43.646], [169.466, -43.647], [169.473, -43.649], [169.484, -43.647], [169.495, -43.641], [169.509, -43.631], [169.549, -43.622], [169.581, -43.604], [169.625, -43.609], [169.646, -43.607], [169.697, -43.578], [169.718, -43.573], [169.733, -43.566], [169.769, -43.528], [169.783, -43.516], [169.787, -43.504], [169.79, -43.492], [169.808, -43.474], [169.833, -43.47], [169.848, -43.462], [169.848, -43.448], [169.855, -43.426], [169.877, -43.408], [169.898, -43.394], [170.032, -43.345], [170.042, -43.33], [170.053, -43.303], [170.075, -43.298], [170.089, -43.288], [170.096, -43.273], [170.104, -43.257], [170.114, -43.252], [170.14, -43.244], [170.165, -43.23], [170.179, -43.225], [170.194, -43.224], [170.204, -43.225], [170.226, -43.235], [170.24, -43.237], [170.305, -43.163], [170.273, -43.158], [170.248, -43.178], [170.226, -43.205], [170.201, -43.217], [170.219, -43.173], [170.255, -43.144], [170.28, -43.129], [170.291, -43.114], [170.291, -43.107], [170.363, -43.104], [170.384, -43.095], [170.392, -43.089], [170.384, -43.08], [170.402, -43.07], [170.417, -43.055], [170.431, -43.046], [170.453, -43.053], [170.456, -43.036], [170.467, -43.033], [170.474, -43.024], [170.514, -43.006], [170.604, -42.984], [170.644, -42.96], [170.676, -42.957], [170.69, -42.957], [170.701, -42.955], [170.708, -42.947], [170.723, -42.937], [170.734, -42.93], [170.77, -42.916], [170.788, -42.901], [170.824, -42.862], [170.842, -42.854], [170.86, -42.844], [170.942, -42.734], [170.957, -42.724], [170.968, -42.722], [170.986, -42.715], [171.004, -42.705], [171.011, -42.693], [171.029, -42.673], [171.036, -42.665], [171.047, -42.661], [171.065, -42.655], [171.079, -42.636], [171.104, -42.601], [171.122, -42.592], [171.194, -42.484], [171.216, -42.465], [171.227, -42.45], [171.227, -42.418], [171.234, -42.396], [171.284, -42.341], [171.306, -42.295], [171.331, -42.148], [171.349, -42.111], [171.353, -42.087], [171.364, -42.064], [171.371, -42.055], [171.403, -42.025], [171.418, -42.006], [171.428, -41.984], [171.446, -41.92], [171.457, -41.901], [171.468, -41.868], [171.49, -41.831], [171.482, -41.819], [171.475, -41.827], [171.472, -41.819], [171.468, -41.814], [171.468, -41.766], [171.482, -41.758], [171.544, -41.765], [171.612, -41.756], [171.634, -41.758], [171.641, -41.758], [171.688, -41.741], [171.785, -41.695], [171.81, -41.674], [171.817, -41.668], [171.832, -41.665], [171.846, -41.668], [171.857, -41.665], [171.864, -41.641], [171.871, -41.636], [171.882, -41.631], [171.889, -41.623], [171.904, -41.608], [171.94, -41.545], [171.947, -41.54], [171.95, -41.538], [171.954, -41.535], [171.958, -41.515], [171.958, -41.511], [171.961, -41.51], [171.965, -41.506], [171.972, -41.498], [171.979, -41.488], [171.983, -41.478], [171.983, -41.466], [171.994, -41.451], [172.019, -41.434], [172.051, -41.42], [172.069, -41.413], [172.066, -41.405], [172.066, -41.395], [172.069, -41.386], [172.084, -41.366], [172.084, -41.354], [172.084, -41.332], [172.087, -41.309], [172.094, -41.299], [172.102, -41.302], [172.105, -41.3], [172.116, -41.295], [172.127, -41.292], [172.141, -41.292], [172.12, -41.263], [172.116, -41.251], [172.105, -41.14], [172.109, -41.128], [172.116, -41.106], [172.12, -41.096], [172.112, -41.044], [172.112, -40.936], [172.105, -40.905], [172.105, -40.887], [172.116, -40.88], [172.127, -40.878], [172.138, -40.877], [172.145, -40.87], [172.156, -40.85], [172.181, -40.826], [172.184, -40.821], [172.184, -40.809], [172.188, -40.806], [172.195, -40.801], [172.202, -40.799], [172.21, -40.799], [172.213, -40.797], [172.217, -40.792], [172.22, -40.787], [172.224, -40.78], [172.231, -40.777], [172.235, -40.777], [172.246, -40.779], [172.253, -40.777], [172.267, -40.768], [172.296, -40.753], [172.307, -40.75], [172.31, -40.747], [172.364, -40.716], [172.465, -40.622], [172.508, -40.589], [172.544, -40.578], [172.526, -40.611], [172.526, -40.622], [172.541, -40.627], [172.544, -40.622], [172.552, -40.613], [172.559, -40.606], [172.577, -40.611], [172.584, -40.61], [172.591, -40.605], [172.598, -40.6], [172.595, -40.584], [172.624, -40.574], [172.627, -40.566], [172.616, -40.556], [172.613, -40.552], [172.598, -40.561], [172.584, -40.568], [172.57, -40.569], [172.559, -40.566], [172.595, -40.527], [172.642, -40.51], [172.84, -40.502], [172.904, -40.508], [172.966, -40.522], [172.998, -40.524], [172.973, -40.53], [172.757, -40.517], [172.742, -40.52], [172.732, -40.53], [172.721, -40.552], [172.71, -40.591], [172.703, -40.61], [172.688, -40.62], [172.696, -40.64], [172.692, -40.649], [172.678, -40.649], [172.66, -40.647], [172.674, -40.674], [172.681, -40.677], [172.696, -40.682], [172.703, -40.687], [172.703, -40.704], [172.688, -40.735], [172.696, -40.75], [172.703, -40.745], [172.721, -40.736], [172.735, -40.765], [172.771, -40.792], [172.858, -40.844], [172.868, -40.848], [172.883, -40.843], [172.908, -40.829], [172.912, -40.828], [172.926, -40.826], [172.93, -40.822], [172.926, -40.811], [172.93, -40.806], [172.944, -40.794], [172.951, -40.794], [172.962, -40.806], [172.976, -40.79], [172.991, -40.78], [173.005, -40.782], [173.016, -40.797], [173.023, -40.811], [173.023, -40.819], [173.016, -40.839], [173.023, -40.848], [173.023, -40.856], [173.009, -40.866], [173.027, -40.87], [173.041, -40.868], [173.056, -40.871], [173.066, -40.887], [173.063, -40.892], [173.052, -40.936], [173.056, -40.954], [173.059, -40.963], [173.056, -40.969], [173.045, -40.983], [173.023, -41.001], [172.998, -41.017], [173.005, -41.022], [173.012, -41.023], [173.02, -41.022], [173.03, -41.017], [173.041, -41.067], [173.045, -41.083], [173.052, -41.098], [173.063, -41.111], [173.07, -41.125], [173.066, -41.14], [173.063, -41.131], [173.056, -41.123], [173.048, -41.116], [173.038, -41.113], [173.03, -41.148], [173.034, -41.159], [173.048, -41.17], [173.056, -41.177], [173.059, -41.189], [173.066, -41.189], [173.077, -41.177], [173.084, -41.189], [173.092, -41.229], [173.106, -41.256], [173.106, -41.265], [173.099, -41.272], [173.084, -41.277], [173.081, -41.285], [173.088, -41.299], [173.102, -41.307], [173.128, -41.312], [173.171, -41.312], [173.192, -41.309], [173.214, -41.302], [173.25, -41.277], [173.286, -41.262], [173.3, -41.246], [173.34, -41.206], [173.401, -41.16], [173.426, -41.152], [173.437, -41.137], [173.448, -41.133], [173.455, -41.137], [173.455, -41.145], [173.452, -41.153], [173.448, -41.162], [173.484, -41.15], [173.502, -41.142], [173.513, -41.13], [173.531, -41.106], [173.538, -41.099], [173.545, -41.099], [173.556, -41.103], [173.563, -41.104], [173.57, -41.093], [173.563, -41.083], [173.57, -41.067], [173.588, -41.056], [173.603, -41.05], [173.621, -41.056], [173.635, -41.069], [173.646, -41.088], [173.65, -41.106], [173.653, -41.106], [173.66, -41.096], [173.664, -41.094], [173.671, -41.096], [173.675, -41.106], [173.689, -41.099], [173.675, -41.076], [173.689, -41.064], [173.714, -41.057], [173.74, -41.049], [173.747, -41.037], [173.747, -41.027], [173.74, -41.02], [173.725, -41.017], [173.689, -41.037], [173.682, -41.035], [173.682, -41.022], [173.682, -41.015], [173.7, -41], [173.707, -40.995], [173.729, -40.985], [173.74, -40.98], [173.75, -40.976], [173.801, -40.969], [173.808, -40.964], [173.83, -40.939], [173.855, -40.925], [173.851, -40.971], [173.873, -40.976], [173.876, -40.973], [173.909, -40.949], [173.909, -40.944], [173.912, -40.931], [173.916, -40.927], [173.92, -40.925], [173.934, -40.922], [173.984, -40.9], [173.992, -40.9], [174.002, -40.9], [174.017, -40.902], [174.024, -40.907], [174.035, -40.934], [174.017, -40.937], [173.97, -40.927], [173.977, -40.941], [173.97, -40.947], [173.959, -40.956], [173.956, -40.969], [173.945, -40.966], [173.934, -40.966], [173.923, -40.969], [173.916, -40.976], [173.92, -40.981], [173.923, -40.986], [173.927, -40.988], [173.934, -40.99], [173.92, -41.001], [173.887, -41.01], [173.855, -41.012], [173.84, -41], [173.826, -40.998], [173.797, -41.001], [173.779, -41.012], [173.804, -41.032], [173.79, -41.039], [173.779, -41.047], [173.783, -41.054], [173.797, -41.059], [173.794, -41.071], [173.79, -41.083], [173.779, -41.093], [173.772, -41.099], [173.779, -41.108], [173.79, -41.11], [173.801, -41.104], [173.804, -41.089], [173.83, -41.064], [173.83, -41.059], [173.894, -41.049], [173.93, -41.049], [173.956, -41.059], [173.945, -41.057], [173.938, -41.059], [173.93, -41.066], [173.927, -41.076], [173.927, -41.084], [173.916, -41.084], [173.909, -41.081], [173.902, -41.079], [173.894, -41.077], [173.887, -41.074], [173.884, -41.074], [173.88, -41.083], [173.88, -41.086], [173.887, -41.093], [173.887, -41.096], [173.887, -41.106], [173.88, -41.11], [173.876, -41.11], [173.866, -41.106], [173.858, -41.13], [173.844, -41.137], [173.83, -41.14], [173.819, -41.155], [173.833, -41.155], [173.851, -41.16], [173.869, -41.17], [173.873, -41.186], [173.873, -41.196], [173.862, -41.218], [173.858, -41.229], [173.848, -41.241], [173.819, -41.253], [173.765, -41.265], [173.768, -41.277], [173.776, -41.283], [173.783, -41.289], [173.79, -41.292], [173.898, -41.245], [173.934, -41.236], [173.934, -41.229], [173.92, -41.226], [173.905, -41.226], [173.894, -41.224], [173.887, -41.216], [173.93, -41.213], [173.952, -41.213], [173.966, -41.219], [173.981, -41.224], [174.006, -41.223], [174.031, -41.216], [174.046, -41.209], [174.038, -41.206], [174.024, -41.196], [174.085, -41.199], [174.114, -41.194], [174.136, -41.175], [174.02, -41.177], [174.002, -41.182], [174.002, -41.186], [174.002, -41.189], [173.999, -41.194], [173.992, -41.196], [173.984, -41.196], [173.981, -41.194], [173.974, -41.192], [173.97, -41.189], [173.977, -41.175], [173.923, -41.192], [173.898, -41.192], [173.887, -41.162], [173.894, -41.145], [173.902, -41.137], [173.916, -41.13], [173.927, -41.121], [173.93, -41.115], [173.927, -41.108], [173.927, -41.103], [173.934, -41.099], [173.945, -41.099], [173.948, -41.096], [173.952, -41.089], [173.948, -41.079], [173.984, -41.086], [173.974, -41.101], [173.97, -41.116], [173.977, -41.147], [173.995, -41.123], [174.002, -41.104], [174.017, -41.093], [174.046, -41.093], [174.028, -41.072], [174.024, -41.064], [174.042, -41.044], [174.042, -41.028], [174.035, -41.017], [174.017, -41.017], [174.01, -41.027], [174.006, -41.042], [173.999, -41.052], [173.988, -41.049], [173.956, -41.023], [173.948, -41.012], [173.984, -41.012], [173.977, -40.998], [173.974, -40.988], [173.981, -40.985], [173.995, -40.99], [173.999, -40.969], [174.017, -40.974], [174.053, -41.003], [174.074, -41.015], [174.096, -41.018], [174.114, -41.015], [174.128, -40.996], [174.146, -41.01], [174.161, -41.003], [174.172, -40.988], [174.168, -40.969], [174.182, -40.973], [174.2, -40.985], [174.211, -41], [174.215, -41.013], [174.215, -41.025], [174.215, -41.034], [174.211, -41.037], [174.19, -41.039], [174.186, -41.044], [174.186, -41.05], [174.19, -41.059], [174.208, -41.071], [174.226, -41.066], [174.244, -41.052], [174.265, -41.032], [174.305, -41], [174.319, -40.996], [174.326, -41.01], [174.319, -41.027], [174.269, -41.089], [174.262, -41.099], [174.262, -41.118], [174.258, -41.126], [174.254, -41.125], [174.24, -41.13], [174.229, -41.138], [174.229, -41.14], [174.226, -41.143], [174.218, -41.147], [174.208, -41.147], [174.204, -41.137], [174.204, -41.096], [174.2, -41.091], [174.193, -41.099], [174.186, -41.111], [174.182, -41.121], [174.168, -41.116], [174.168, -41.125], [174.175, -41.137], [174.182, -41.147], [174.204, -41.165], [174.211, -41.174], [174.215, -41.189], [174.211, -41.191], [174.2, -41.194], [174.197, -41.196], [174.197, -41.192], [174.175, -41.202], [174.168, -41.209], [174.161, -41.216], [174.154, -41.221], [174.143, -41.223], [174.089, -41.223], [174.064, -41.229], [174.046, -41.243], [174.035, -41.238], [174.02, -41.236], [174.01, -41.24], [174.002, -41.25], [173.988, -41.246], [173.97, -41.25], [173.952, -41.258], [173.938, -41.268], [173.934, -41.28], [173.959, -41.278], [173.988, -41.273], [173.999, -41.268], [174.02, -41.273], [174.035, -41.268], [174.049, -41.26], [174.067, -41.25], [174.078, -41.25], [174.089, -41.253], [174.1, -41.253], [174.118, -41.243], [174.139, -41.24], [174.15, -41.236], [174.157, -41.246], [174.172, -41.255], [174.186, -41.262], [174.2, -41.265], [174.211, -41.263], [174.226, -41.253], [174.236, -41.25], [174.265, -41.248], [174.283, -41.24], [174.326, -41.216], [174.312, -41.241], [174.298, -41.265], [174.29, -41.272], [174.269, -41.285], [174.262, -41.295], [174.254, -41.305], [174.251, -41.314], [174.244, -41.322], [174.215, -41.329], [174.19, -41.343], [174.175, -41.346], [174.179, -41.336], [174.197, -41.316], [174.2, -41.309], [174.19, -41.305], [174.168, -41.322], [174.154, -41.319], [174.161, -41.305], [174.132, -41.321], [174.114, -41.344], [174.1, -41.373], [174.078, -41.4], [174.056, -41.425], [174.049, -41.437], [174.053, -41.456], [174.064, -41.486], [174.064, -41.501], [174.056, -41.516], [174.078, -41.52], [174.089, -41.533], [174.092, -41.545], [174.089, -41.552], [174.092, -41.555], [174.103, -41.56], [174.114, -41.559], [174.121, -41.538], [174.114, -41.533], [174.107, -41.513], [174.103, -41.498], [174.118, -41.506], [174.172, -41.579], [174.175, -41.592], [174.179, -41.606], [174.182, -41.616], [174.19, -41.635], [174.19, -41.645], [174.211, -41.699], [174.215, -41.706], [174.226, -41.724], [174.247, -41.733], [174.272, -41.736], [174.294, -41.731], [174.287, -41.755], [174.215, -41.856], [174.197, -41.876], [174.082, -41.969], [174.002, -42.032], [173.974, -42.067], [173.963, -42.091], [173.956, -42.111], [173.956, -42.141], [173.956, -42.158], [173.945, -42.168], [173.938, -42.178], [173.93, -42.19], [173.93, -42.195], [173.909, -42.214], [173.891, -42.241], [173.873, -42.254], [173.826, -42.276], [173.804, -42.292], [173.776, -42.33], [173.768, -42.334], [173.761, -42.334], [173.747, -42.334], [173.736, -42.351], [173.732, -42.357], [173.722, -42.364], [173.711, -42.371], [173.704, -42.379], [173.704, -42.395], [173.707, -42.405], [173.722, -42.42], [173.729, -42.428], [173.722, -42.437], [173.714, -42.444], [173.696, -42.423], [173.686, -42.418], [173.668, -42.415], [173.657, -42.418], [173.635, -42.433], [173.624, -42.437], [173.61, -42.444], [173.56, -42.491], [173.538, -42.53], [173.524, -42.574], [173.498, -42.611], [173.455, -42.628], [173.455, -42.634], [173.462, -42.634], [173.466, -42.636], [173.47, -42.639], [173.477, -42.641], [173.398, -42.766], [173.387, -42.8], [173.372, -42.822], [173.354, -42.839], [173.322, -42.852], [173.322, -42.862], [173.326, -42.881], [173.326, -42.893], [173.326, -42.898], [173.326, -42.903], [173.318, -42.916], [173.308, -42.925], [173.3, -42.928], [173.293, -42.933], [173.29, -42.947], [173.286, -42.953], [173.279, -42.96], [173.236, -42.98], [173.225, -42.984], [173.196, -42.987], [173.153, -43.002], [173.149, -43.013], [173.146, -43.024], [173.142, -43.033], [173.131, -43.04], [173.084, -43.067], [172.948, -43.092], [172.915, -43.102], [172.886, -43.127], [172.811, -43.17], [172.796, -43.188], [172.775, -43.23], [172.75, -43.257], [172.746, -43.266], [172.75, -43.279]]]]};
+const fmt=m=>{m=Math.round(m||0);return Math.floor(m/60)+":"+String(m%60).padStart(2,"0")+" h"};
+const gq=q=>"https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(q+", New Zealand");
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+
+// Unterkünfte (eindeutig, in Reihenfolge)
+const stays=[];
+DAYS.forEach((d,i)=>{const a=d.acc;const last=stays[stays.length-1];
+  if(!last||last.n!==a.n){stays.push({...a,first:i,last:i,no:stays.length+1})}else last.last=i;});
+
+// Kopfzahlen
+let tot=0,drv=0,km=0,hikeKm=0;
+DAYS.forEach(d=>d.items.forEach(it=>{if(it.m){tot+=it.m;if(it.dr)drv+=it.m}if(it.km){if(it.k==="drive")km+=it.km;if(it.k==="hike")hikeKm+=it.km}}));
+document.getElementById("stats").innerHTML=
+ `<div><b>${DAYS.length} Tage</b><span>Reisedauer</span></div>
+  <div><b>${stays.filter(s=>!s.end).length}</b><span>Unterkünfte</span></div>
+  <div><b>${Math.round(km).toLocaleString("de-DE")} km</b><span>mit dem Auto</span></div>
+  <div><b>${Math.round(hikeKm)} km</b><span>zu Fuß</span></div>`;
+
+// Tagesliste
+const daysEl=document.getElementById("days"),nav=document.getElementById("daynav");
+DAYS.forEach((d,i)=>{
+  let t=0,dr=0;d.items.forEach(it=>{if(it.m){t+=it.m;if(it.dr)dr+=it.m}});
+  const er=t-dr;
+  const pts=d.items.filter(it=>it.lat);
+  const wp=pts.slice(0,9).map(p=>p.lat+","+p.lng).join("|");
+  const dirUrl=`https://www.google.com/maps/dir/?api=1&origin=${d.from.lat},${d.from.lng}&destination=${d.acc.lat},${d.acc.lng}${wp?"&waypoints="+encodeURIComponent(wp):""}&travelmode=driving`;
+  const [wd,dt]=d.d.split(" ");
+  const sec=document.createElement("section");sec.className="day";sec.id="tag"+(i+1);
+  sec.innerHTML=`<div class="dhead" tabindex="0" role="button" aria-label="Tag ${i+1} auf der Karte zeigen">
+     <div class="drow"><div><div class="dnum">Tag ${i+1} · ${wd}</div><div class="dtitle">${dt.slice(0,6)}</div></div>
+       <div class="dtot">${fmt(t)}</div></div>
+     <div class="bar" aria-hidden="true"><i class="d" style="width:${t?dr/t*100:0}%"></i><i class="e" style="width:${t?er/t*100:0}%"></i></div>
+     <div class="meta"><span class="k1">Fahrt ${fmt(dr)}</span><span class="k2">Erlebnis ${fmt(er)}</span></div>
+     <div class="night"><span class="tag">${d.acc.end?"Ende":"Nacht"}</span>${esc(d.acc.n)} <a class="gm" href="${gq(d.acc.q)}" target="_blank" rel="noopener">Maps</a></div>
+   </div>
+   <ul class="items">${d.items.map(it=>{
+     if(it.k==="drive") return `<li class="it drive"><span class="t">${it.m?fmt(it.m).replace(" h",""):""}</span><span class="nm">${esc(it.n)}${it.i?` · <span class="inf">${esc(it.i)}</span>`:""}</span><span class="km">${it.km?String(it.km).replace(".",",")+" km":""}</span></li>`;
+     const b=it.k==="hike"?'<span class="badge b-hike">Wanderung</span>':it.k==="boat"?'<span class="badge b-boat">Boot</span>':(it.m?'<span class="badge b-stop">Stopp</span>':"");
+     const o=it.opt?'<span class="badge b-opt">optional</span>':"";
+     return `<li class="it"><span class="t">${it.m?fmt(it.m).replace(" h",""):"–"}</span>
+       <div><div class="nm">${b}${o}${esc(it.n.replace(" (optional)",""))}</div>${it.i?`<div class="inf">${esc(it.i)}</div>`:""}${it.km?`<div class="km">${String(it.km).replace(".",",")} km</div>`:""}</div>
+       <div class="lk">${(it.at||[]).map((u,k)=>`<a class="gm at" href="${u}" target="_blank" rel="noopener">AllTrails${it.at.length>1?" "+(k+1):""}</a>`).join("")}${it.q?`<a class="gm" href="${gq(it.q)}" target="_blank" rel="noopener">Maps</a>`:""}</div></li>`}).join("")}</ul>
+   <div class="dfoot"><a class="gm" href="${dirUrl}" target="_blank" rel="noopener">Tagesroute in Google Maps</a></div>`;
+  daysEl.appendChild(sec);
+  sec.querySelector(".dhead").addEventListener("click",()=>select(i,false));
+  sec.querySelector(".dhead").addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();select(i,false)}});
+  const b=document.createElement("a");b.href="#tag"+(i+1);b.textContent=dt.slice(0,6);b.title=`Tag ${i+1}`;
+  b.addEventListener("click",e=>{e.preventDefault();select(i,true)});nav.appendChild(b);
+});
+
+// Karte
+const map=L.map("map",{zoomControl:true,attributionControl:false,zoomSnap:.25}).setView([-43.6,170.6],6);
+let land,route,stayLayer=L.layerGroup().addTo(map),poiLayer=L.layerGroup().addTo(map);
+function draw(){
+  if(land)land.remove();if(route)route.remove();stayLayer.clearLayers();poiLayer.clearLayers();
+  land=L.geoJSON(SI,{style:{color:css("--landline"),weight:1,fillColor:css("--land"),fillOpacity:1},interactive:false}).addTo(map);
+  const line=[[DAYS[0].from.lat,DAYS[0].from.lng]].concat(stays.map(s=>[s.lat,s.lng]));
+  route=L.polyline(line,{color:css("--route"),weight:3,dashArray:"6 6",opacity:.9}).addTo(map);
+  DAYS.forEach((d,i)=>d.items.filter(it=>it.lat).forEach(it=>{
+    const on=sel===i;
+    const m=L.circleMarker([it.lat,it.lng],{radius:on?7:4.5,color:css("--surface"),weight:on?2:1,fillColor:on?css("--ochre"):css("--glacier"),fillOpacity:on?1:.85});
+    m.bindPopup(`<b>${esc(it.n)}</b><br>Tag ${i+1} · ${esc(d.d)}${it.m?`<br>${fmt(it.m)}`:""}<br><a href="${gq(it.q)}" target="_blank" rel="noopener">In Google Maps öffnen</a>${(it.at||[]).map(u=>`<br><a href="${u}" target="_blank" rel="noopener">Auf AllTrails ansehen</a>`).join("")}`);
+    m.on("click",()=>select(i,true,true));
+    poiLayer.addLayer(m); if(on)m.bringToFront();
+  }));
+  stays.forEach(s=>{
+    const on=sel!==null&&sel>=s.first-0&&sel<=s.last;
+    const ic=L.divIcon({className:"",html:`<div class="pin${on?" on":""}">${s.end?"E":s.no}</div>`,iconSize:[24,24],iconAnchor:[12,12]});
+    const nights=s.end?"Rückgabe Mietwagen":`${DAYS[s.first].d.split(" ")[1].slice(0,6)}–${(DAYS[s.last+1]?DAYS[s.last+1].d:"").split(" ")[1]?.slice(0,6)||""} · ${s.last-s.first+1} ${s.last-s.first?"Nächte":"Nacht"}`;
+    L.marker([s.lat,s.lng],{icon:ic,zIndexOffset:1000}).bindPopup(`<b>${esc(s.n)}</b><br>${nights}<br><a href="${gq(s.q)}" target="_blank" rel="noopener">In Google Maps öffnen</a>`).addTo(stayLayer);
+  });
+}
+let sel=null;
+function fitAll(){map.fitBounds(L.latLngBounds(stays.map(s=>[s.lat,s.lng]).concat([[DAYS[0].from.lat,DAYS[0].from.lng]])).pad(.08))}
+function jumpTo(el){
+  const off=nav.getBoundingClientRect().height+12;
+  const go=()=>window.scrollTo(0,Math.max(0,el.getBoundingClientRect().top+window.pageYOffset-off));
+  go();requestAnimationFrame(()=>{if(Math.abs(el.getBoundingClientRect().top-off)>4)go()});
+  setTimeout(()=>{if(Math.abs(el.getBoundingClientRect().top-off)>4)go()},300);
+}
+function select(i,scroll,fromMap){
+  sel=i;
+  document.querySelectorAll(".day").forEach((e,j)=>e.classList.toggle("on",j===i));
+  if(scroll)jumpTo(document.getElementById("tag"+(i+1)));
+  try{draw()}catch(e){console.error(e)}
+  document.querySelectorAll(".day").forEach((e,j)=>e.classList.toggle("on",j===i));
+  nav.querySelectorAll("a").forEach((e,j)=>e.classList.toggle("on",j===i));
+  const nb=nav.children[i];nav.scrollLeft=Math.max(0,nb.offsetLeft-nav.clientWidth/2+nb.offsetWidth/2);
+  const d=DAYS[i];const pts=[[d.from.lat,d.from.lng],[d.acc.lat,d.acc.lng]].concat(d.items.filter(it=>it.lat).map(it=>[it.lat,it.lng]));
+  try{map.fitBounds(L.latLngBounds(pts).pad(.25),{maxZoom:10})}catch(e){console.error(e)}
+}
+document.getElementById("allbtn").addEventListener("click",()=>{sel=null;draw();document.querySelectorAll(".day.on,.daynav .on").forEach(e=>e.classList.remove("on"));fitAll()});
+draw();fitAll();
+const h=location.hash.match(/^#tag(\d+)$/);if(h&&DAYS[h[1]-1])select(h[1]-1,true);
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change",draw);
+new MutationObserver(draw).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
+</script>
+
+
+<div id="offline" class="note" style="text-align:center;padding:8px 16px" hidden>Offline – du siehst den zuletzt gespeicherten Stand.</div>
+<script>
+if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))}
+function net(){document.getElementById("offline").hidden=navigator.onLine}
+addEventListener("online",net);addEventListener("offline",net);net();
+</script>
+</body>
+</html>
